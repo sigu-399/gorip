@@ -11,4 +11,46 @@
 
 package gorip
 
-import ()
+import (
+	"log"
+	"net/http"
+	"time"
+)
+
+type Server struct {
+	pattern string
+	address string
+	router  *router
+}
+
+type serverHandler struct {
+	server *Server
+}
+
+func NewServer(pattern string, address string) *Server {
+	return &Server{pattern: pattern, address: address, router: NewRouter()}
+}
+
+func (s *Server) ListenAndServe() error {
+
+	handler := &serverHandler{server: s}
+	http.Handle(s.pattern, handler)
+
+	return http.ListenAndServe(s.address, nil)
+}
+
+func (s *Server) GetRouter() *router {
+	return s.router
+}
+
+func (sh *serverHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+
+	timeStart := time.Now()
+
+	// TODO
+
+	timeEnd := time.Now()
+
+	log.Printf("Response : %2.2f ms", timeEnd.Sub(timeStart).Seconds()*1000)
+
+}
