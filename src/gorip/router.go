@@ -99,7 +99,7 @@ func (r *router) RegisterRoute(routeString string) error {
 // Adds a route variable validator to the router
 func (r *router) RegisterRouteVariableValidator(kind string, validator RouteVariableValidator) error {
 
-	log.Printf("Registering route variable validator of kind %s\n", kind)
+	log.Printf("Registering route variable validator of kind '%s'\n", kind)
 
 	if r.GetRouteVariableValidatorByKind(kind) != nil {
 		return errors.New(fmt.Sprintf(`Route variable validator of kind '%s' already exists`, kind))
@@ -123,11 +123,15 @@ func (r *router) GetRouteVariableValidatorByKind(kind string) RouteVariableValid
 // Find a matching route given url
 func (r *router) FindNodeByRoute(routeString string) (routerNode, error) {
 
-	currentRouterNode := r.rootNode
+	// Check root
+	if routeString == ROUTE_ELEMENT_SEPARATOR {
+		return r.rootNode, nil
+	}
 
 	splitRouteString := strings.Split(routeString, ROUTE_ELEMENT_SEPARATOR)
 
 	// Start parsing parts ( ommit root ( part : ``, route : `/` ) with 1: )
+	currentRouterNode := r.rootNode
 	for _, v := range splitRouteString[1:] {
 
 		findChild := currentRouterNode.GetChildByPart(v, true)
@@ -135,7 +139,7 @@ func (r *router) FindNodeByRoute(routeString string) (routerNode, error) {
 		if findChild != nil {
 			currentRouterNode = findChild
 		} else {
-			return nil, errors.New(fmt.Sprintf(`Cannot find a route given the part '%s'`, v))
+			return nil, errors.New(fmt.Sprintf(`Could not find a route given the part '%s'`, v))
 		}
 	}
 
