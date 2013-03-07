@@ -56,3 +56,7 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	log.Printf("Response : %2.2f ms", durationMs)
 
 }
+
+func (s *Server) RegisterEndpoint(e endpoint) error {
+	return s.router.RegisterRoute(e.GetRoute())
+}
