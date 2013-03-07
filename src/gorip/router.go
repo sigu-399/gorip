@@ -92,6 +92,14 @@ func (r *router) RegisterEndpoint(endp *endpoint) error {
 
 	}
 
+	// Link the endpoint to the last node
+
+	if currentRouterNode.GetEndpoint() != nil {
+		return errors.New(fmt.Sprintf(`Endpoint already exists on route %s`, routeString))
+	} else {
+		currentRouterNode.SetEndpoint(endp)
+	}
+
 	return nil
 
 }
@@ -178,12 +186,15 @@ type routerNode interface {
 	GetChildren() map[string]routerNode
 	AddChild(routerNode) error
 	GetChildByPart(part string, invariableMode bool) routerNode
+	SetEndpoint(endp *endpoint)
+	GetEndpoint() *endpoint
 }
 
 type routerNodeImplementation struct {
 	part         string
 	children     map[string]routerNode
 	parentRouter *router
+	endp         *endpoint
 }
 
 // Initialize the interface implementation of routerNode, 
@@ -197,6 +208,14 @@ func (rni *routerNodeImplementation) Initialize(r *router, part string, isVariab
 
 func (rni *routerNodeImplementation) GetPart() string {
 	return rni.part
+}
+
+func (rni *routerNodeImplementation) SetEndpoint(endp *endpoint) {
+	rni.endp = endp
+}
+
+func (rni *routerNodeImplementation) GetEndpoint() *endpoint {
+	return rni.endp
 }
 
 func (rni *routerNodeImplementation) GetNodeImplementation() *routerNodeImplementation {

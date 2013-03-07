@@ -50,6 +50,10 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 		log.Printf("%s", node)
 	}
 
+	if node.GetEndpoint() == nil {
+		log.Printf("Warning : No endpoint found on this route")
+	}
+
 	timeEnd := time.Now()
 	durationMs := timeEnd.Sub(timeStart).Seconds() * 1000
 
