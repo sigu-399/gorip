@@ -23,19 +23,13 @@ type Server struct {
 	router  *router
 }
 
-type serverHandler struct {
-	server *Server
-}
-
 func NewServer(pattern string, address string) *Server {
 	return &Server{pattern: pattern, address: address, router: NewRouter()}
 }
 
 func (s *Server) ListenAndServe() error {
 
-	handler := &serverHandler{server: s}
-	http.Handle(s.pattern, handler)
-
+	http.Handle(s.pattern, s)
 	return http.ListenAndServe(s.address, nil)
 }
 
@@ -43,7 +37,7 @@ func (s *Server) GetRouter() *router {
 	return s.router
 }
 
-func (sh *serverHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	timeStart := time.Now()
 
