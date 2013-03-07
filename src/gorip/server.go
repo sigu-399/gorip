@@ -33,6 +33,10 @@ func (s *Server) ListenAndServe() error {
 	return http.ListenAndServe(s.address, nil)
 }
 
+func (s *Server) GetRouter() *router {
+	return s.router
+}
+
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	timeStart := time.Now()
@@ -40,7 +44,8 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// TODO
 
 	timeEnd := time.Now()
+	durationMs := timeEnd.Sub(timeStart).Seconds() * 1000
 
-	log.Printf("Response : %2.2f ms", timeEnd.Sub(timeStart).Seconds()*1000)
+	log.Printf("Response : %2.2f ms", durationMs)
 
 }
