@@ -37,11 +37,22 @@ func (s *Server) GetRouter() *router {
 	return s.router
 }
 
-func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 
 	timeStart := time.Now()
 
-	// TODO
+	urlPath := request.URL.Path
+
+	node, err := s.router.FindNodeByRoute(urlPath)
+	if err != nil {
+		log.Printf("Warning : %s", err.Error())
+	}
+
+	if node == nil {
+		log.Printf("Warning : Could not find route for %s", urlPath)
+	} else {
+		log.Printf("%s", node)
+	}
 
 	timeEnd := time.Now()
 	durationMs := timeEnd.Sub(timeStart).Seconds() * 1000
