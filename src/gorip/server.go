@@ -33,10 +33,6 @@ func (s *Server) ListenAndServe() error {
 	return http.ListenAndServe(s.address, nil)
 }
 
-func (s *Server) GetRouter() *router {
-	return s.router
-}
-
 func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 
 	timeStart := time.Now()
