@@ -11,10 +11,11 @@
 
 package gorip
 
-import (
-	"net/http"
-)
+import ()
 
 type Resource interface {
-	Execute(writer http.ResponseWriter, request *http.Request)
+	Execute(context *resourceContext)
+}
+
+type resourceContext struct {
 }
