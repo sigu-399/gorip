@@ -15,7 +15,8 @@ package gorip
 import ()
 
 type endpoint struct {
-	route string
+	route     string
+	resources []Resource
 }
 
 func NewEndpoint(route string) *endpoint {
@@ -24,4 +25,8 @@ func NewEndpoint(route string) *endpoint {
 
 func (e *endpoint) GetRoute() string {
 	return e.route
+}
+
+func (e *endpoint) AddResource(resource Resource) {
+	e.resources = append(e.resources, resource)
 }
