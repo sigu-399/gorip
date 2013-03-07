@@ -39,8 +39,6 @@ func NewRouter() *router {
 // Adds a route to the router tree
 func (r *router) RegisterRoute(routeString string) error {
 
-	log.Printf("Registering route : %s\n", routeString)
-
 	if !strings.HasPrefix(routeString, ROUTE_ELEMENT_SEPARATOR) {
 		return errors.New(fmt.Sprintf(`A route must start with '%s'`, ROUTE_ELEMENT_SEPARATOR))
 	}

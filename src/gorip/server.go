@@ -58,5 +58,6 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 }
 
 func (s *Server) RegisterEndpoint(e endpoint) error {
+	log.Printf("Registering endpoint : %s\n", e.GetRoute())
 	return s.router.RegisterRoute(e.GetRoute())
 }
