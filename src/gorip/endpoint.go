@@ -6,6 +6,7 @@
 // repository-desc  REST Server Framework - ( gorip: REST In Peace ) - Go language
 // 
 // description		Defines a REST endpoint.
+//					An endpoint is a url route and associated resources.
 // 
 // created      	07-03-2013
 
