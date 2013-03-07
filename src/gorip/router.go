@@ -36,8 +36,10 @@ func NewRouter() *router {
 	return r
 }
 
-// Adds a route to the router tree
-func (r *router) RegisterRoute(routeString string) error {
+// Adds a endpoint to the router tree
+func (r *router) RegisterEndpoint(endp *endpoint) error {
+
+	routeString := endp.GetRoute()
 
 	if !strings.HasPrefix(routeString, ROUTE_ELEMENT_SEPARATOR) {
 		return errors.New(fmt.Sprintf(`A route must start with '%s'`, ROUTE_ELEMENT_SEPARATOR))

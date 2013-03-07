@@ -57,7 +57,12 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 
 }
 
-func (s *Server) RegisterEndpoint(e endpoint) error {
+func (s *Server) RegisterEndpoint(e *endpoint) error {
+
+	if e == nil {
+		panic(`Endpoint cannot be nil`)
+	}
+
 	log.Printf("Registering endpoint : %s\n", e.GetRoute())
-	return s.router.RegisterRoute(e.GetRoute())
+	return s.router.RegisterEndpoint(e)
 }

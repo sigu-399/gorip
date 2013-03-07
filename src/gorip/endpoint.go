@@ -17,8 +17,8 @@ type endpoint struct {
 	route string
 }
 
-func NewEndpoint(route string) endpoint {
-	return endpoint{route: route}
+func NewEndpoint(route string) *endpoint {
+	return &endpoint{route: route}
 }
 
 func (e *endpoint) GetRoute() string {
