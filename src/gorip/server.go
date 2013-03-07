@@ -48,10 +48,10 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 		log.Printf("Warning : Could not find route for %s", urlPath)
 	} else {
 		log.Printf("%s", node)
-	}
 
-	if node.GetEndpoint() == nil {
-		log.Printf("Warning : No endpoint found on this route")
+		if node.GetEndpoint() == nil {
+			log.Printf("Warning : No endpoint found on this route")
+		}
 	}
 
 	timeEnd := time.Now()
@@ -69,4 +69,8 @@ func (s *Server) RegisterEndpoint(e *endpoint) error {
 
 	log.Printf("Registering endpoint : %s\n", e.GetRoute())
 	return s.router.RegisterEndpoint(e)
+}
+
+func (s *Server) RegisterRouteVariableValidator(kind string, validator RouteVariableValidator) error {
+	return s.router.RegisterRouteVariableValidator(kind, validator)
 }
