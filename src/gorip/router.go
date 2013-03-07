@@ -129,11 +129,13 @@ func (r *router) GetRouteVariableValidatorByKind(kind string) RouteVariableValid
 }
 
 // Find a matching route given url
-func (r *router) FindNodeByRoute(routeString string) (routerNode, error) {
+func (r *router) FindNodeByRoute(routeString string) (routerNode, map[string]string, error) {
+
+	routeVariableMap := make(map[string]string)
 
 	// Check root
 	if routeString == ROUTE_ELEMENT_SEPARATOR {
-		return r.rootNode, nil
+		return r.rootNode, routeVariableMap, nil
 	}
 
 	splitRouteString := strings.Split(routeString, ROUTE_ELEMENT_SEPARATOR)
@@ -142,16 +144,24 @@ func (r *router) FindNodeByRoute(routeString string) (routerNode, error) {
 	currentRouterNode := r.rootNode
 	for _, v := range splitRouteString[1:] {
 
-		findChild := currentRouterNode.GetChildByPart(v, true)
+		foundChild := currentRouterNode.GetChildByPart(v, true)
 
-		if findChild != nil {
-			currentRouterNode = findChild
+		if foundChild != nil {
+
+			// Extract route variable if any
+			switch foundChild.(type) {
+			case *routerNodeVariable:
+				variable := foundChild.(*routerNodeVariable)
+				routeVariableMap[variable.identifier] = v
+			}
+
+			currentRouterNode = foundChild
 		} else {
-			return nil, errors.New(fmt.Sprintf(`Could not find a route given the part '%s'`, v))
+			return nil, nil, errors.New(fmt.Sprintf(`Could not find a route given the part '%s'`, v))
 		}
 	}
 
-	return currentRouterNode, nil
+	return currentRouterNode, routeVariableMap, nil
 }
 
 // Displays the resulting router tree in the log

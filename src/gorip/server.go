@@ -39,7 +39,7 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 
 	urlPath := request.URL.Path
 
-	node, err := s.router.FindNodeByRoute(urlPath)
+	node, variables, err := s.router.FindNodeByRoute(urlPath)
 	if err != nil {
 		log.Printf("Warning : %s", err.Error())
 	}
@@ -47,7 +47,8 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	if node == nil {
 		log.Printf("Warning : Could not find route for %s", urlPath)
 	} else {
-		log.Printf("%s", node)
+		log.Printf("node : %s", node)
+		log.Printf("variables : %s", variables)
 
 		if node.GetEndpoint() == nil {
 			log.Printf("Warning : No endpoint found on this route")
