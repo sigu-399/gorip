@@ -90,20 +90,6 @@ type acceptHeaderParser struct {
 	contentTypes []acceptHeaderElementParser
 }
 
-type acceptHeaderElementParser struct {
-	contentType string
-	priority    float64
-}
-
-func newAcceptHeaderElementParser(value string) (acceptHeaderElementParser, error) {
-	p := acceptHeaderElementParser{}
-	err := p.parse(value)
-	if err != nil {
-		return acceptHeaderElementParser{}, err
-	}
-	return p, nil
-}
-
 func NewAcceptHeaderParser(value string) (acceptHeaderParser, error) {
 	p := acceptHeaderParser{}
 	err := p.parse(value)
@@ -127,6 +113,24 @@ func (p *acceptHeaderParser) parse(value string) error {
 	}
 
 	return nil
+}
+
+func (p *acceptHeaderParser) HasAcceptElement(value string) bool {
+	return len(p.contentTypes) > 0
+}
+
+type acceptHeaderElementParser struct {
+	contentType string
+	priority    float64
+}
+
+func newAcceptHeaderElementParser(value string) (acceptHeaderElementParser, error) {
+	p := acceptHeaderElementParser{}
+	err := p.parse(value)
+	if err != nil {
+		return acceptHeaderElementParser{}, err
+	}
+	return p, nil
 }
 
 func (p *acceptHeaderElementParser) parse(value string) error {
@@ -164,6 +168,8 @@ func (p *acceptHeaderElementParser) parse(value string) error {
 				return errors.New(`Invalid accept element : only 2 parameters are allowed`)
 			}
 		}
+	} else {
+		return errors.New(`Accept element cannot be empty`)
 	}
 
 	return nil
