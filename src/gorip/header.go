@@ -12,6 +12,7 @@
 package gorip
 
 import (
+	"errors"
 	"strconv"
 	"strings"
 )
@@ -21,13 +22,16 @@ type contentTypeHeaderParser struct {
 	charset     *string
 }
 
-func NewContentTypeHeaderParser(value string) contentTypeHeaderParser {
+func NewContentTypeHeaderParser(value string) (contentTypeHeaderParser, error) {
 	p := contentTypeHeaderParser{}
-	p.parse(value)
-	return p
+	err := p.parse(value)
+	if err != nil {
+		return contentTypeHeaderParser{}, err
+	}
+	return p, nil
 }
 
-func (p *contentTypeHeaderParser) parse(value string) {
+func (p *contentTypeHeaderParser) parse(value string) error {
 
 	if value != `` {
 
@@ -47,12 +51,16 @@ func (p *contentTypeHeaderParser) parse(value string) {
 
 				trimmed := strings.TrimSpace(split[i])
 
-				// TODO : check charsets ?
 				if strings.HasPrefix(trimmed, `charset=`) {
 					splitCharset := strings.Split(trimmed, `=`)
 					if len(splitCharset) == 2 {
+						// TODO : check charsets ?
 						p.charset = &splitCharset[1]
+					} else {
+						return errors.New(`Invalid Content-Type parameter : expecting key-value charset`)
 					}
+				} else {
+					return errors.New(`Invalid Content-Type parameter : expecting charset`)
 				}
 
 			}
@@ -85,30 +93,41 @@ type acceptHeaderElementParser struct {
 	priority    float64
 }
 
-func newAcceptHeaderElementParser(value string) acceptHeaderElementParser {
+func newAcceptHeaderElementParser(value string) (acceptHeaderElementParser, error) {
 	p := acceptHeaderElementParser{}
-	p.parse(value)
-	return p
+	err := p.parse(value)
+	if err != nil {
+		return acceptHeaderElementParser{}, err
+	}
+	return p, nil
 }
 
-func NewAcceptHeaderParser(value string) acceptHeaderParser {
+func NewAcceptHeaderParser(value string) (acceptHeaderParser, error) {
 	p := acceptHeaderParser{}
-	p.parse(value)
-	return p
+	err := p.parse(value)
+	if err != nil {
+		return acceptHeaderParser{}, err
+	}
+	return p, nil
 }
 
-func (p *acceptHeaderParser) parse(value string) {
+func (p *acceptHeaderParser) parse(value string) error {
 
 	if value != `` {
 		split := strings.Split(value, `,`)
 		for i := range split {
-			element := newAcceptHeaderElementParser(split[i])
+			element, err := newAcceptHeaderElementParser(split[i])
+			if err != nil {
+				return err
+			}
 			p.contentTypes = append(p.contentTypes, element)
 		}
 	}
+
+	return nil
 }
 
-func (p *acceptHeaderElementParser) parse(value string) {
+func (p *acceptHeaderElementParser) parse(value string) error {
 
 	if value != `` {
 		p.priority = 1 // default
@@ -119,19 +138,31 @@ func (p *acceptHeaderElementParser) parse(value string) {
 		} else {
 			if len(split) == 2 {
 				p.contentType = strings.TrimSpace(split[0])
-
 				trimmed := split[1]
 				if strings.HasPrefix(trimmed, `q=`) {
 					splitPriority := strings.Split(trimmed, `=`)
 					if len(splitPriority) == 2 {
 						fValue, err := strconv.ParseFloat(splitPriority[1], 64)
 						if err == nil {
-							p.priority = fValue
+							if fValue >= 0 && fValue <= 1 {
+								p.priority = fValue
+							} else {
+								return errors.New(`Invalid accept element : q value must be a float`)
+							}
+						} else {
+							return errors.New(`Invalid accept element : q value must be a float`)
 						}
+					} else {
+						return errors.New(`Invalid accept element : expecting key-value q`)
 					}
+				} else {
+					return errors.New(`Invalid accept element : expecting q=`)
 				}
+			} else {
+				return errors.New(`Invalid accept element : only 2 parameters are allowed`)
 			}
 		}
 	}
 
+	return nil
 }
