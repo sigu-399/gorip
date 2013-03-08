@@ -11,7 +11,9 @@
 
 package gorip
 
-import ()
+import (
+	"bytes"
+)
 
 type Resource interface {
 	Factory() Resource
@@ -29,4 +31,5 @@ type ResourceContext struct {
 
 type ResourceResult struct {
 	HttpStatus int
+	Body       *bytes.Buffer
 }

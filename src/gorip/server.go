@@ -14,6 +14,7 @@ package gorip
 import (
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -107,11 +108,30 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 						if resource == nil {
 							log.Printf(`Resource factory must instanciate a valid Resource`)
 						} else {
+
 							result := resource.Execute(&resourceContext)
-							// TODO
-							writer.Header().Set(`Content-Length`, `0`)
-							//writer.Header().Add(`Content-Type`, resourceContext.contentType)
+
+							// Http response
+							bodyLen := 0
+							if result.Body != nil {
+								bodyLen = result.Body.Len()
+							}
+
+							writer.Header().Set(`Content-Length`, strconv.Itoa(bodyLen))
+
+							if bodyLen > 0 {
+								writer.Header().Add(`Content-Type`, *resourceContext.ContentTypeOut)
+							}
+
 							writer.WriteHeader(result.HttpStatus)
+
+							if bodyLen > 0 {
+								_, err := result.Body.WriteTo(writer)
+								if err != nil {
+									log.Printf(`Error while writing the body %s`, err.Error())
+								}
+							}
+
 						}
 					}
 				}
