@@ -13,6 +13,7 @@ package gorip
 
 import (
 	"errors"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -90,6 +91,17 @@ type acceptHeaderParser struct {
 	contentTypes []acceptHeaderElementParser
 }
 
+type acceptHeaderElementParsers []acceptHeaderElementParser
+
+func (s acceptHeaderElementParsers) Len() int      { return len(s) }
+func (s acceptHeaderElementParsers) Swap(i, j int) { s[i], s[j] = s[j], s[i] }
+
+type SortByPriority struct{ acceptHeaderElementParsers }
+
+func (s SortByPriority) Less(i, j int) bool {
+	return s.acceptHeaderElementParsers[i].priority > s.acceptHeaderElementParsers[j].priority
+}
+
 func NewAcceptHeaderParser(value string) (acceptHeaderParser, error) {
 	p := acceptHeaderParser{}
 	err := p.parse(value)
@@ -111,6 +123,8 @@ func (p *acceptHeaderParser) parse(value string) error {
 			p.contentTypes = append(p.contentTypes, element)
 		}
 	}
+
+	sort.Sort(SortByPriority{p.contentTypes})
 
 	return nil
 }
