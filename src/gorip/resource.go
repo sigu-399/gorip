@@ -14,6 +14,7 @@ package gorip
 import ()
 
 type Resource interface {
+	Factory() Resource
 	Execute(context *ResourceContext)
 	GetMethod() string
 	GetContentTypeIn() []string

@@ -101,8 +101,13 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 
 						// Found a matching resource implementation: 
 
-						// Executes it
-						matchingResource.Execute(&resourceContext)
+						// Create a new instance from factory and executes it
+						resource := matchingResource.Factory()
+						if resource == nil {
+							log.Printf(`Resource factory must instanciate a valid Resource`)
+						} else {
+							resource.Execute(&resourceContext)
+						}
 					}
 				}
 			}
