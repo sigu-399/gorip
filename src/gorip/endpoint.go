@@ -37,6 +37,8 @@ func (e *endpoint) GetResources() []Resource {
 
 func (e *endpoint) FindMatchingResource(method string, acceptParser *acceptHeaderParser) Resource {
 
+// TODO Warning when multiple resources matches ?
+
 	// Loop through accepted content types, highest priority first
 	for _, acceptElement := range acceptParser.contentTypes {
 		// Find a resource for given method

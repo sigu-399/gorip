@@ -98,10 +98,12 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 					if matchingResource == nil {
 						log.Printf(`No available resource for this Content-Type`)
 					} else {
-						// Found a resource implementation, executes it
+
+						// Found a matching resource implementation: 
+
+						// Executes it
 						matchingResource.Execute(&resourceContext)
 					}
-
 				}
 			}
 		}
