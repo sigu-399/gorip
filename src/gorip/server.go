@@ -93,7 +93,7 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 					log.Printf(`No resource found on this route`)
 				} else {
 
-					matchingResource := endp.FindMatchingResource(method, &acceptParser)
+					matchingResource, expectedContentType := endp.FindMatchingResource(method, &acceptParser)
 
 					if matchingResource == nil {
 						log.Printf(`No available resource for this Content-Type`)
@@ -101,12 +101,19 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 
 						// Found a matching resource implementation: 
 
+						// Add expected content type to the context 
+						resourceContext.contentType = expectedContentType
+
 						// Create a new instance from factory and executes it
 						resource := matchingResource.Factory()
 						if resource == nil {
 							log.Printf(`Resource factory must instanciate a valid Resource`)
 						} else {
-							resource.Execute(&resourceContext)
+							result := resource.Execute(&resourceContext)
+							// TODO
+							writer.Header().Set(`Content-Length`, `0`)
+							writer.Header().Add(`Content-Type`, resourceContext.contentType)
+							writer.WriteHeader(result.HttpStatus)
 						}
 					}
 				}
