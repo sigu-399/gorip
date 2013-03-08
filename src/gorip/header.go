@@ -115,7 +115,7 @@ func (p *acceptHeaderParser) parse(value string) error {
 	return nil
 }
 
-func (p *acceptHeaderParser) HasAcceptElement(value string) bool {
+func (p *acceptHeaderParser) HasAcceptElement() bool {
 	return len(p.contentTypes) > 0
 }
 
