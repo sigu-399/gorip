@@ -22,9 +22,9 @@ type Resource interface {
 }
 
 type ResourceContext struct {
-	routeVariables map[string]string
-	contentTypeIn  *string
-	contentTypeOut *string
+	RouteVariables map[string]string
+	ContentTypeIn  *string
+	ContentTypeOut *string
 }
 
 type ResourceResult struct {

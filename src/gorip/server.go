@@ -57,7 +57,7 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 		// Route was found:
 
 		// Add route variables to the context
-		resourceContext.routeVariables = routeVariables
+		resourceContext.RouteVariables = routeVariables
 
 		if node.GetEndpoint() == nil {
 			log.Printf("Warning : No endpoint found for this route")
@@ -99,8 +99,8 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 						// Found a matching resource implementation: 
 
 						// Add expected content type to the context 
-						resourceContext.contentTypeIn = contentTypeIn
-						resourceContext.contentTypeOut = contentTypeOut
+						resourceContext.ContentTypeIn = contentTypeIn
+						resourceContext.ContentTypeOut = contentTypeOut
 
 						// Create a new instance from factory and executes it
 						resource := matchingResource.Factory()
