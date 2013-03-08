@@ -15,7 +15,7 @@ import ()
 
 type Resource interface {
 	Factory() Resource
-	Execute(context *ResourceContext)
+	Execute(context *ResourceContext) ResourceResult
 	GetMethod() string
 	GetContentTypeIn() []string
 	GetContentTypeOut() []string
@@ -23,4 +23,9 @@ type Resource interface {
 
 type ResourceContext struct {
 	routeVariables map[string]string
+	contentType    string
+}
+
+type ResourceResult struct {
+	HttpStatus int
 }
