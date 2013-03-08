@@ -1,5 +1,10 @@
 # gorip
-REST Server Framework - ( gorip: REST In Peace ) - Go language
+
+REST Server Framework
+
+Go (R)EST (I)n (P)eace )
+
+Go language
 
 ## Status
 Work in progress ( 70% done )
