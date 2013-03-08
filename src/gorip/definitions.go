@@ -14,12 +14,12 @@ package gorip
 type HttpMethod string
 
 const (
-	GET     HttpMethod = "GET"
-	HEAD    HttpMethod = "HEAD"
-	POST    HttpMethod = "POST"
-	PUT     HttpMethod = "PUT"
-	PATCH   HttpMethod = "PATCH"
-	DELETE  HttpMethod = "DELETE"
-	TRACE   HttpMethod = "TRACE"
-	CONNECT HttpMethod = "CONNECT"
+	HttpMethodGET     HttpMethod = "GET"
+	HttpMethodHEAD    HttpMethod = "HEAD"
+	HttpMethodPOST    HttpMethod = "POST"
+	HttpMethodPUT     HttpMethod = "PUT"
+	HttpMethodPATCH   HttpMethod = "PATCH"
+	HttpMethodDELETE  HttpMethod = "DELETE"
+	HttpMethodTRACE   HttpMethod = "TRACE"
+	HttpMethodCONNECT HttpMethod = "CONNECT"
 )
