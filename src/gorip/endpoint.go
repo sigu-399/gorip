@@ -34,3 +34,23 @@ func (e *endpoint) AddResource(resource Resource) {
 func (e *endpoint) GetResources() []Resource {
 	return e.resources
 }
+
+func (e *endpoint) FindMatchingResource(method string, acceptParser *acceptHeaderParser) Resource {
+
+	// Loop through accepted content types, highest priority first
+	for _, acceptElement := range acceptParser.contentTypes {
+		// Find a resource for given method
+		for _, v := range e.resources {
+			if v.GetMethod() == method {
+				allContentTypeOut := v.GetContentTypeOut()
+				// If content type matches or 'matching everything' */* then returns the resource
+				for _, contentTypeOut := range allContentTypeOut {
+					if contentTypeOut == acceptElement.contentType || acceptElement.contentType == `*/*` {
+						return v
+					}
+				}
+			}
+		}
+	}
+	return nil
+}
