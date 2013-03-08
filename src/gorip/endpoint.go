@@ -31,6 +31,6 @@ func (e *endpoint) AddResource(resource Resource) {
 	e.resources = append(e.resources, resource)
 }
 
-func (e *endpoint) GetResources(resource Resource) []Resource {
+func (e *endpoint) GetResources() []Resource {
 	return e.resources
 }
