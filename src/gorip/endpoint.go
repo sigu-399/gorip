@@ -30,3 +30,7 @@ func (e *endpoint) GetRoute() string {
 func (e *endpoint) AddResource(resource Resource) {
 	e.resources = append(e.resources, resource)
 }
+
+func (e *endpoint) GetResources(resource Resource) []Resource {
+	return e.resources
+}
