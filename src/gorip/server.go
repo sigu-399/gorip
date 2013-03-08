@@ -12,6 +12,7 @@
 package gorip
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -73,6 +74,7 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 				log.Printf(`Invalid Content-Type header : ` + err.Error())
 			}
 
+			fmt.Printf("Accept : %s\n", request.Header.Get(`Accept`))
 			acceptParser, err := NewAcceptHeaderParser(request.Header.Get(`Accept`))
 			if err != nil {
 				log.Printf(`Invalid Accept header : ` + err.Error())
@@ -83,10 +85,25 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 			} else {
 
 				// Headers are OK:
-				// TODO
 
+				endp := node.GetEndpoint()
+				availableResourceImplementations := endp.GetResources()
+
+				if len(availableResourceImplementations) == 0 {
+					log.Printf(`No resource found on this route`)
+				} else {
+
+					matchingResource := endp.FindMatchingResource(method, &acceptParser)
+
+					if matchingResource == nil {
+						log.Printf(`No available resource for this Content-Type`)
+					} else {
+						// Found a resource implementation, executes it
+						matchingResource.Execute(&resourceContext)
+					}
+
+				}
 			}
-
 		}
 	}
 
