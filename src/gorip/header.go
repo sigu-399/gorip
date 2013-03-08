@@ -66,6 +66,8 @@ func (p *contentTypeHeaderParser) parse(value string) error {
 			}
 		}
 	}
+
+	return nil
 }
 
 func (p *contentTypeHeaderParser) HasContentType() bool {
