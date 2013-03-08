@@ -39,6 +39,9 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	timeStart := time.Now()
 
 	urlPath := request.URL.Path
+	method := request.Method
+
+	log.Printf("Requesting %s %s", method, urlPath)
 
 	node, variables, err := s.router.FindNodeByRoute(urlPath)
 	if err != nil {
@@ -67,13 +70,19 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 				fmt.Printf("%s\n", acceptParser)
 			}
 
+			if !acceptParser.HasAcceptElement() {
+				log.Printf(`No valid Accept header was given`)
+			} else {
+				//TODO
+			}
+
 		}
 	}
 
 	timeEnd := time.Now()
 	durationMs := timeEnd.Sub(timeStart).Seconds() * 1000
 
-	log.Printf("Response : %2.2f ms", durationMs)
+	log.Printf("Response time : %2.2f ms", durationMs)
 
 }
 
