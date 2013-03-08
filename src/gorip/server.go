@@ -12,6 +12,7 @@
 package gorip
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -52,6 +53,11 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 
 		if node.GetEndpoint() == nil {
 			log.Printf("Warning : No endpoint found on this route")
+		} else {
+			contentTypeParser := NewContentTypeHeaderParser(request.Header.Get(`Content-Type`))
+			fmt.Printf("%s\n", contentTypeParser)
+			acceptParser := NewAcceptHeaderParser(request.Header.Get(`Accept`))
+			fmt.Printf("%s\n", acceptParser)
 		}
 	}
 
