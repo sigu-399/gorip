@@ -12,6 +12,7 @@
 package gorip
 
 import (
+	"strconv"
 	"strings"
 )
 
@@ -20,8 +21,8 @@ type contentTypeHeaderParser struct {
 	charset     *string
 }
 
-func NewContentTypeHeaderParser(value string) *contentTypeHeaderParser {
-	p := &contentTypeHeaderParser{}
+func NewContentTypeHeaderParser(value string) contentTypeHeaderParser {
+	p := contentTypeHeaderParser{}
 	p.parse(value)
 	return p
 }
@@ -29,19 +30,31 @@ func NewContentTypeHeaderParser(value string) *contentTypeHeaderParser {
 func (p *contentTypeHeaderParser) parse(value string) {
 
 	if value != `` {
+
 		split := strings.Split(value, `;`)
+
 		if len(split) == 0 {
-			p.contentType = &value
+
+			trimmed := strings.TrimSpace(value)
+			p.contentType = &trimmed
+
 		} else {
-			p.contentType = &split[0]
+
+			trimmed := strings.TrimSpace(split[0])
+			p.contentType = &trimmed
+
 			for i := range split {
+
 				trimmed := strings.TrimSpace(split[i])
+
+				// TODO : check charsets ?
 				if strings.HasPrefix(trimmed, `charset=`) {
 					splitCharset := strings.Split(trimmed, `=`)
 					if len(splitCharset) == 2 {
 						p.charset = &splitCharset[1]
 					}
 				}
+
 			}
 		}
 	}
@@ -64,4 +77,61 @@ func (p *contentTypeHeaderParser) GetCharset() string {
 }
 
 type acceptHeaderParser struct {
+	contentTypes []acceptHeaderElementParser
+}
+
+type acceptHeaderElementParser struct {
+	contentType string
+	priority    float64
+}
+
+func newAcceptHeaderElementParser(value string) acceptHeaderElementParser {
+	p := acceptHeaderElementParser{}
+	p.parse(value)
+	return p
+}
+
+func NewAcceptHeaderParser(value string) acceptHeaderParser {
+	p := acceptHeaderParser{}
+	p.parse(value)
+	return p
+}
+
+func (p *acceptHeaderParser) parse(value string) {
+
+	if value != `` {
+		split := strings.Split(value, `,`)
+		for i := range split {
+			element := newAcceptHeaderElementParser(split[i])
+			p.contentTypes = append(p.contentTypes, element)
+		}
+	}
+}
+
+func (p *acceptHeaderElementParser) parse(value string) {
+
+	if value != `` {
+		p.priority = 1 // default
+
+		split := strings.Split(value, `;`)
+		if len(split) == 1 {
+			p.contentType = strings.TrimSpace(split[0])
+		} else {
+			if len(split) == 2 {
+				p.contentType = strings.TrimSpace(split[0])
+
+				trimmed := split[1]
+				if strings.HasPrefix(trimmed, `q=`) {
+					splitPriority := strings.Split(trimmed, `=`)
+					if len(splitPriority) == 2 {
+						fValue, err := strconv.ParseFloat(splitPriority[1], 64)
+						if err == nil {
+							p.priority = fValue
+						}
+					}
+				}
+			}
+		}
+	}
+
 }
