@@ -20,4 +20,5 @@ type Resource interface {
 }
 
 type ResourceContext struct {
+	routeVariables map[string]string
 }
