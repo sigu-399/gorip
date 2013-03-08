@@ -12,7 +12,6 @@ Work in progress ( 70% done )
 package main
 
 import (
-	"fmt"
 	"gorip"
 	"net/http"
 	"strconv"
@@ -59,9 +58,7 @@ func (r *ResourceThingGET) GetContentTypeOut() []string {
 
 // The implementation of the endpoint
 func (r *ResourceThingGET) Execute(context *gorip.ResourceContext) gorip.ResourceResult {
-	fmt.Printf("Hello World\n")
-	// TODO : Write to the body
-	return gorip.ResourceResult{HttpStatus: http.StatusOK}
+	return gorip.ResourceResult{HttpStatus: http.StatusOK, Body: bytes.NewBufferString("Hello World !")}
 }
 
 func main() {
