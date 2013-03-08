@@ -15,7 +15,7 @@ import ()
 
 type Resource interface {
 	Execute(context *ResourceContext)
-	GetMethod() HttpMethod
+	GetMethod() string
 	GetContentTypeIn() []string
 	GetContentTypeOut() []string
 }
