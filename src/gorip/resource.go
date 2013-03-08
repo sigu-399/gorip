@@ -14,8 +14,10 @@ package gorip
 import ()
 
 type Resource interface {
-	Execute(context *resourceContext)
+	Execute(context *ResourceContext)
+	GetContentTypeIn() []string
+	GetContentTypeOut() []string
 }
 
-type resourceContext struct {
+type ResourceContext struct {
 }
