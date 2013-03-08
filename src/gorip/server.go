@@ -12,7 +12,6 @@
 package gorip
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -69,12 +68,10 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 			// Parse Content-Type and Accept headers
 
 			contentTypeParser, err := NewContentTypeHeaderParser(request.Header.Get(`Content-Type`))
-			log.Printf("contentTypeParser : %s", contentTypeParser)
 			if err != nil {
 				log.Printf(`Invalid Content-Type header : ` + err.Error())
 			}
 
-			fmt.Printf("Accept : %s\n", request.Header.Get(`Accept`))
 			acceptParser, err := NewAcceptHeaderParser(request.Header.Get(`Accept`))
 			if err != nil {
 				log.Printf(`Invalid Accept header : ` + err.Error())
@@ -93,7 +90,7 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 					log.Printf(`No resource found on this route`)
 				} else {
 
-					matchingResource, expectedContentType := endp.FindMatchingResource(method, &acceptParser)
+					matchingResource, contentTypeIn, contentTypeOut := endp.FindMatchingResource(method, &contentTypeParser, &acceptParser)
 
 					if matchingResource == nil {
 						log.Printf(`No available resource for this Content-Type`)
@@ -102,7 +99,8 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 						// Found a matching resource implementation: 
 
 						// Add expected content type to the context 
-						resourceContext.contentType = expectedContentType
+						resourceContext.contentTypeIn = contentTypeIn
+						resourceContext.contentTypeOut = contentTypeOut
 
 						// Create a new instance from factory and executes it
 						resource := matchingResource.Factory()
@@ -112,7 +110,7 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 							result := resource.Execute(&resourceContext)
 							// TODO
 							writer.Header().Set(`Content-Length`, `0`)
-							writer.Header().Add(`Content-Type`, resourceContext.contentType)
+							//writer.Header().Add(`Content-Type`, resourceContext.contentType)
 							writer.WriteHeader(result.HttpStatus)
 						}
 					}

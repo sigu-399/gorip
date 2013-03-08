@@ -35,25 +35,51 @@ func (e *endpoint) GetResources() []Resource {
 	return e.resources
 }
 
-func (e *endpoint) FindMatchingResource(method string, acceptParser *acceptHeaderParser) (Resource, string) {
+func (e *endpoint) FindMatchingResource(method string, contentTypeParser *contentTypeHeaderParser, acceptParser *acceptHeaderParser) (Resource, *string, *string) {
 
-	// TODO Warning when multiple resources matches ?
+	var resultContentTypeIn *string
+	var resultContentTypeOut *string
 
-	// Loop through accepted content types, highest priority first
+	// Loop through accepted OUT content types, highest priority first
 	for _, acceptElement := range acceptParser.contentTypes {
 		// Find a resource for given method
 		for _, v := range e.resources {
 			if v.GetMethod() == method {
 				allContentTypeOut := v.GetContentTypeOut()
-				// If content type matches or 'matching everything' */* then returns the resource
+				allContentTypeIn := v.GetContentTypeIn()
+
+				// If OUT content type matches or 'matching everything' */* then the resource matches
 				for _, contentTypeOut := range allContentTypeOut {
 					if contentTypeOut == acceptElement.contentType || acceptElement.contentType == `*/*` {
-						return v, contentTypeOut
+
+						resultContentTypeOut = &contentTypeOut
+
+						// Also the IN content type must match
+						matchesIn := false
+
+						// No content type given, and none expected : OK
+						if !contentTypeParser.HasContentType() && len(allContentTypeIn) == 0 {
+							matchesIn = true
+							resultContentTypeIn = nil
+						}
+
+						// Content type is given and was found in resource : OK
+						if contentTypeParser.HasContentType() && len(allContentTypeIn) > 0 {
+							for _, contentTypeIn := range allContentTypeIn {
+								if contentTypeIn == contentTypeParser.GetContentType() {
+									matchesIn = true
+									resultContentTypeIn = &contentTypeIn
+								}
+							}
+						}
+						if matchesIn {
+							return v, resultContentTypeIn, resultContentTypeOut
+						}
 					}
 				}
 			}
 		}
 	}
 
-	return nil, ``
+	return nil, nil, nil
 }
