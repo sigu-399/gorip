@@ -12,7 +12,6 @@
 package gorip
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -41,9 +40,12 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	urlPath := request.URL.Path
 	method := request.Method
 
+	resourceContext := ResourceContext{}
+
 	log.Printf("Requesting %s %s", method, urlPath)
 
-	node, variables, err := s.router.FindNodeByRoute(urlPath)
+	// Find route node and associated route variables
+	node, routeVariables, err := s.router.FindNodeByRoute(urlPath)
 	if err != nil {
 		log.Printf("Warning : %s", err.Error())
 	}
@@ -51,29 +53,38 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	if node == nil {
 		log.Printf("Warning : Could not find route for %s", urlPath)
 	} else {
-		log.Printf("node : %s", node)
-		log.Printf("variables : %s", variables)
+
+		// Route was found:
+
+		// Add route variables to the context
+		resourceContext.routeVariables = routeVariables
 
 		if node.GetEndpoint() == nil {
-			log.Printf("Warning : No endpoint found on this route")
+			log.Printf("Warning : No endpoint found for this route")
 		} else {
+
+			// Endpoint was found:
+
+			// Parse Content-Type and Accept headers
+
 			contentTypeParser, err := NewContentTypeHeaderParser(request.Header.Get(`Content-Type`))
+			log.Printf("contentTypeParser : %s", contentTypeParser)
 			if err != nil {
 				log.Printf(`Invalid Content-Type header : ` + err.Error())
-			} else {
-				fmt.Printf("%s\n", contentTypeParser)
 			}
+
 			acceptParser, err := NewAcceptHeaderParser(request.Header.Get(`Accept`))
 			if err != nil {
 				log.Printf(`Invalid Accept header : ` + err.Error())
-			} else {
-				fmt.Printf("%s\n", acceptParser)
 			}
 
 			if !acceptParser.HasAcceptElement() {
 				log.Printf(`No valid Accept header was given`)
 			} else {
-				//TODO
+
+				// Headers are OK:
+				// TODO
+
 			}
 
 		}
