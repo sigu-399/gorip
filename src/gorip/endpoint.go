@@ -35,9 +35,9 @@ func (e *endpoint) GetResources() []Resource {
 	return e.resources
 }
 
-func (e *endpoint) FindMatchingResource(method string, acceptParser *acceptHeaderParser) Resource {
+func (e *endpoint) FindMatchingResource(method string, acceptParser *acceptHeaderParser) (Resource, string) {
 
-// TODO Warning when multiple resources matches ?
+	// TODO Warning when multiple resources matches ?
 
 	// Loop through accepted content types, highest priority first
 	for _, acceptElement := range acceptParser.contentTypes {
@@ -48,11 +48,12 @@ func (e *endpoint) FindMatchingResource(method string, acceptParser *acceptHeade
 				// If content type matches or 'matching everything' */* then returns the resource
 				for _, contentTypeOut := range allContentTypeOut {
 					if contentTypeOut == acceptElement.contentType || acceptElement.contentType == `*/*` {
-						return v
+						return v, contentTypeOut
 					}
 				}
 			}
 		}
 	}
-	return nil
+
+	return nil, ``
 }
