@@ -315,8 +315,8 @@ type RouteVariableValidator interface {
 }
 
 const (
-	REGEXP_ROUTE_VARIABLE_PATTERN       = "\\{(.*?)\\}"
-	REGEXP_ROUTE_VARIABLE_PARTS_PATTERN = "\\{([0-9a-zA-Z_]*)\\:([0-9a-zA-Z_]*)\\}"
+	const_regexp_route_variable_pattern       = "\\{(.*?)\\}"
+	const_regexp_route_variable_parts_pattern = "\\{([0-9a-zA-Z_]*)\\:([0-9a-zA-Z_]*)\\}"
 )
 
 var regexpRouteVariable *regexp.Regexp      // anything like {...}
@@ -344,12 +344,12 @@ func init() {
 
 	var err error
 
-	regexpRouteVariable, err = regexp.Compile(REGEXP_ROUTE_VARIABLE_PATTERN)
+	regexpRouteVariable, err = regexp.Compile(const_regexp_route_variable_pattern)
 	if err != nil {
 		panic("Could not compile regexpRouteVariable")
 	}
 
-	regexpRouteVariableParts, err = regexp.Compile(REGEXP_ROUTE_VARIABLE_PARTS_PATTERN)
+	regexpRouteVariableParts, err = regexp.Compile(const_regexp_route_variable_parts_pattern)
 	if err != nil {
 		panic("Could not compile regexpRouteVariableParts")
 	}
