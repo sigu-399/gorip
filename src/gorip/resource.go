@@ -21,13 +21,15 @@ type Resource interface {
 	GetMethod() string
 	GetContentTypeIn() []string
 	GetContentTypeOut() []string
+	GetQueryParameters() map[string]QueryParameter
 }
 
 type ResourceContext struct {
-	RouteVariables map[string]string
-	ContentTypeIn  *string
-	ContentTypeOut *string
-	Body           *bytes.Buffer
+	RouteVariables  map[string]string
+	QueryParameters map[string]string
+	ContentTypeIn   *string
+	ContentTypeOut  *string
+	Body            *bytes.Buffer
 }
 
 type ResourceResult struct {
