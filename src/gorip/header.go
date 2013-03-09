@@ -13,6 +13,7 @@ package gorip
 
 import (
 	"errors"
+	"fmt"
 	"sort"
 	"strconv"
 	"strings"
@@ -38,7 +39,7 @@ func (p *contentTypeHeaderParser) parse(value string) error {
 
 		split := strings.Split(value, `;`)
 
-		if len(split) == 0 {
+		if len(split) == 1 {
 
 			trimmed := strings.TrimSpace(value)
 			p.contentType = &trimmed
@@ -48,23 +49,20 @@ func (p *contentTypeHeaderParser) parse(value string) error {
 			trimmed := strings.TrimSpace(split[0])
 			p.contentType = &trimmed
 
-			for i := range split {
-
-				trimmed := strings.TrimSpace(split[i])
-
-				if strings.HasPrefix(trimmed, `charset=`) {
-					splitCharset := strings.Split(trimmed, `=`)
-					if len(splitCharset) == 2 {
-						// TODO : check charsets ?
-						p.charset = &splitCharset[1]
-					} else {
-						return errors.New(`Invalid Content-Type parameter : expecting key-value charset`)
-					}
+			trimmedCharset := strings.TrimSpace(split[1])
+			fmt.Printf("|%s|\n", trimmedCharset)
+			if strings.HasPrefix(trimmedCharset, `charset=`) {
+				splitCharset := strings.Split(trimmedCharset, `=`)
+				if len(splitCharset) == 2 {
+					// TODO : check charsets ?
+					p.charset = &splitCharset[1]
 				} else {
-					return errors.New(`Invalid Content-Type parameter : expecting charset`)
+					return errors.New(`Invalid Content-Type parameter : expecting key-value charset`)
 				}
-
+			} else {
+				return errors.New(`Invalid Content-Type parameter : expecting charset`)
 			}
+
 		}
 	}
 
