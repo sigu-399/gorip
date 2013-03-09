@@ -92,9 +92,9 @@ type acceptHeaderElementParsers []acceptHeaderElementParser
 func (s acceptHeaderElementParsers) Len() int      { return len(s) }
 func (s acceptHeaderElementParsers) Swap(i, j int) { s[i], s[j] = s[j], s[i] }
 
-type SortByPriority struct{ acceptHeaderElementParsers }
+type sortByPriority struct{ acceptHeaderElementParsers }
 
-func (s SortByPriority) Less(i, j int) bool {
+func (s sortByPriority) Less(i, j int) bool {
 	return s.acceptHeaderElementParsers[i].priority > s.acceptHeaderElementParsers[j].priority
 }
 
@@ -120,7 +120,7 @@ func (p *acceptHeaderParser) parse(value string) error {
 		}
 	}
 
-	sort.Sort(SortByPriority{p.contentTypes})
+	sort.Sort(sortByPriority{p.contentTypes})
 
 	return nil
 }
