@@ -133,15 +133,18 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 							for qpKey, qpObject := range resource.GetQueryParameters() {
 								qpValue := urlValues.Get(qpKey)
 								if qpValue == `` {
-									resourceContext.QueryParameters[qpKey] = qpObject.DefaultValue
-								} else {
+									qpValue = qpObject.DefaultValue
 									if !qpObject.IsValid(qpValue) {
-										log.Printf(`Query parameter %s must be of kind %s`, qpKey, qpObject.Kind)
-									} else {
-										// Add to context
-										resourceContext.QueryParameters[qpKey] = qpValue
+										log.Printf(`Query parameter %s default value must be of kind %s`, qpKey, qpObject.Kind)
 									}
 								}
+								if !qpObject.IsValid(qpValue) {
+									log.Printf(`Query parameter %s must be of kind %s`, qpKey, qpObject.Kind)
+								} else {
+									// Add to context
+									resourceContext.QueryParameters[qpKey] = qpValue
+								}
+
 							}
 
 							result := resource.Execute(&resourceContext)
