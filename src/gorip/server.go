@@ -27,7 +27,7 @@ type Server struct {
 }
 
 func NewServer(pattern string, address string) *Server {
-	return &Server{pattern: pattern, address: address, router: NewRouter()}
+	return &Server{pattern: pattern, address: address, router: newRouter()}
 }
 
 func (s *Server) ListenAndServe() error {

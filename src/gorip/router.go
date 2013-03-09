@@ -29,7 +29,7 @@ type router struct {
 	routeVariableValidators map[string]RouteVariableValidator
 }
 
-func NewRouter() *router {
+func newRouter() *router {
 	r := &router{}
 	r.routeVariableValidators = make(map[string]RouteVariableValidator)
 	r.rootNode = newRouterNodeInvariable(r, const_route_node_part)
