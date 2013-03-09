@@ -112,21 +112,21 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 							result := resource.Execute(&resourceContext)
 
 							// Http response
-							bodyLen := 0
-							if result.Body != nil {
-								bodyLen = result.Body.Len()
+							bodyOutLen := 0
+							if result.BodyOut != nil {
+								bodyOutLen = result.BodyOut.Len()
 							}
 
-							writer.Header().Set(`Content-Length`, strconv.Itoa(bodyLen))
+							writer.Header().Set(`Content-Length`, strconv.Itoa(bodyOutLen))
 
-							if bodyLen > 0 {
+							if bodyOutLen > 0 {
 								writer.Header().Add(`Content-Type`, *resourceContext.ContentTypeOut)
 							}
 
 							writer.WriteHeader(result.HttpStatus)
 
-							if bodyLen > 0 {
-								_, err := result.Body.WriteTo(writer)
+							if bodyOutLen > 0 {
+								_, err := result.BodyOut.WriteTo(writer)
 								if err != nil {
 									log.Printf(`Error while writing the body %s`, err.Error())
 								}

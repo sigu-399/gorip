@@ -31,5 +31,6 @@ type ResourceContext struct {
 
 type ResourceResult struct {
 	HttpStatus int
-	Body       *bytes.Buffer
+	BodyIn     *bytes.Buffer
+	BodyOut    *bytes.Buffer
 }
