@@ -12,6 +12,8 @@
 package gorip
 
 import (
+	"bytes"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"strconv"
@@ -103,6 +105,19 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 						resourceContext.ContentTypeIn = contentTypeIn
 						resourceContext.ContentTypeOut = contentTypeOut
 
+						// Read request body
+
+						bodyInBytes, err := ioutil.ReadAll(request.Body)
+						if err != nil {
+							log.Printf(`Could not read request body`)
+						} else {
+							if resourceContext.ContentTypeIn == nil && len(bodyInBytes) > 0 {
+								log.Printf(`Body is not allowed for this resource`)
+							} else {
+								resourceContext.Body = bytes.NewBuffer(bodyInBytes)
+							}
+						}
+
 						// Create a new instance from factory and executes it
 						resource := matchingResource.Factory()
 						if resource == nil {
@@ -113,8 +128,8 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 
 							// Http response
 							bodyOutLen := 0
-							if result.BodyOut != nil {
-								bodyOutLen = result.BodyOut.Len()
+							if result.Body != nil {
+								bodyOutLen = result.Body.Len()
 							}
 
 							writer.Header().Set(`Content-Length`, strconv.Itoa(bodyOutLen))
@@ -126,7 +141,7 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 							writer.WriteHeader(result.HttpStatus)
 
 							if bodyOutLen > 0 {
-								_, err := result.BodyOut.WriteTo(writer)
+								_, err := result.Body.WriteTo(writer)
 								if err != nil {
 									log.Printf(`Error while writing the body %s`, err.Error())
 								}

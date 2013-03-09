@@ -27,10 +27,10 @@ type ResourceContext struct {
 	RouteVariables map[string]string
 	ContentTypeIn  *string
 	ContentTypeOut *string
+	Body           *bytes.Buffer
 }
 
 type ResourceResult struct {
 	HttpStatus int
-	BodyIn     *bytes.Buffer
-	BodyOut    *bytes.Buffer
+	Body       *bytes.Buffer
 }
