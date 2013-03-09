@@ -13,6 +13,7 @@ package gorip
 
 import (
 	"bytes"
+	_ "fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -123,6 +124,25 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 						if resource == nil {
 							log.Printf(`Resource factory must instanciate a valid Resource`)
 						} else {
+
+							// Check and provide query parameters
+
+							resourceContext.QueryParameters = make(map[string]string)
+							urlValues := request.URL.Query()
+
+							for qpKey, qpObject := range resource.GetQueryParameters() {
+								qpValue := urlValues.Get(qpKey)
+								if qpValue == `` {
+									resourceContext.QueryParameters[qpKey] = qpObject.DefaultValue
+								} else {
+									if !qpObject.IsValid(qpValue) {
+										log.Printf(`Query parameter %s must be of kind %s`, qpKey, qpObject.Kind)
+									} else {
+										// Add to context
+										resourceContext.QueryParameters[qpKey] = qpValue
+									}
+								}
+							}
 
 							result := resource.Execute(&resourceContext)
 
