@@ -23,7 +23,7 @@ type contentTypeHeaderParser struct {
 	charset     *string
 }
 
-func NewContentTypeHeaderParser(value string) (contentTypeHeaderParser, error) {
+func newContentTypeHeaderParser(value string) (contentTypeHeaderParser, error) {
 	p := contentTypeHeaderParser{}
 	err := p.parse(value)
 	if err != nil {
@@ -98,7 +98,7 @@ func (s sortByPriority) Less(i, j int) bool {
 	return s.acceptHeaderElementParsers[i].priority > s.acceptHeaderElementParsers[j].priority
 }
 
-func NewAcceptHeaderParser(value string) (acceptHeaderParser, error) {
+func newAcceptHeaderParser(value string) (acceptHeaderParser, error) {
 	p := acceptHeaderParser{}
 	err := p.parse(value)
 	if err != nil {

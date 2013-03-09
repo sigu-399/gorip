@@ -70,12 +70,12 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 
 			// Parse Content-Type and Accept headers
 
-			contentTypeParser, err := NewContentTypeHeaderParser(request.Header.Get(`Content-Type`))
+			contentTypeParser, err := newContentTypeHeaderParser(request.Header.Get(`Content-Type`))
 			if err != nil {
 				log.Printf(`Invalid Content-Type header : ` + err.Error())
 			}
 
-			acceptParser, err := NewAcceptHeaderParser(request.Header.Get(`Accept`))
+			acceptParser, err := newAcceptHeaderParser(request.Header.Get(`Accept`))
 			if err != nil {
 				log.Printf(`Invalid Accept header : ` + err.Error())
 			}
