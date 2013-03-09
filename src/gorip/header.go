@@ -13,7 +13,6 @@ package gorip
 
 import (
 	"errors"
-	"fmt"
 	"sort"
 	"strconv"
 	"strings"
@@ -50,7 +49,6 @@ func (p *contentTypeHeaderParser) parse(value string) error {
 			p.contentType = &trimmed
 
 			trimmedCharset := strings.TrimSpace(split[1])
-			fmt.Printf("|%s|\n", trimmedCharset)
 			if strings.HasPrefix(trimmedCharset, `charset=`) {
 				splitCharset := strings.Split(trimmedCharset, `=`)
 				if len(splitCharset) == 2 {
