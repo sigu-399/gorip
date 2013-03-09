@@ -12,6 +12,8 @@ Work in progress ( 70% done )
 package main
 
 import (
+	"bytes"
+	"fmt"
 	"gorip"
 	"net/http"
 	"strconv"
@@ -56,9 +58,15 @@ func (r *ResourceThingGET) GetContentTypeOut() []string {
 	return []string{`text/plain`}
 }
 
+func (r *ResourceThingGET) GetQueryParameters() map[string]gorip.QueryParameter {
+	return map[string]gorip.QueryParameter{
+		"who": gorip.QueryParameter{Kind: gorip.QueryParameterString, DefaultValue: "World"}}
+}
+
 // The implementation of the endpoint
 func (r *ResourceThingGET) Execute(context *gorip.ResourceContext) gorip.ResourceResult {
-	return gorip.ResourceResult{HttpStatus: http.StatusOK, Body: bytes.NewBufferString("Hello World !")}
+	fmt.Printf("context %s\n", context)
+	return gorip.ResourceResult{HttpStatus: http.StatusOK, Body: bytes.NewBufferString(fmt.Sprintf(`Hello %s !`, context.QueryParameters["who"]))}
 }
 
 func main() {
