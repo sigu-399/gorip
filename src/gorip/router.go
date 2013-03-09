@@ -20,8 +20,8 @@ import (
 )
 
 const (
-	ROOT_NODE_PART          = ``
-	ROUTE_ELEMENT_SEPARATOR = `/`
+	const_route_node_part         = ``
+	const_route_element_separator = `/`
 )
 
 type router struct {
@@ -32,7 +32,7 @@ type router struct {
 func NewRouter() *router {
 	r := &router{}
 	r.routeVariableValidators = make(map[string]RouteVariableValidator)
-	r.rootNode = newRouterNodeInvariable(r, ROOT_NODE_PART)
+	r.rootNode = newRouterNodeInvariable(r, const_route_node_part)
 	return r
 }
 
@@ -41,13 +41,13 @@ func (r *router) RegisterEndpoint(endp *endpoint) error {
 
 	routeString := endp.GetRoute()
 
-	if !strings.HasPrefix(routeString, ROUTE_ELEMENT_SEPARATOR) {
-		return errors.New(fmt.Sprintf(`A route must start with '%s'`, ROUTE_ELEMENT_SEPARATOR))
+	if !strings.HasPrefix(routeString, const_route_element_separator) {
+		return errors.New(fmt.Sprintf(`A route must start with '%s'`, const_route_element_separator))
 	}
 
 	currentRouterNode := r.rootNode
 
-	splitRouteString := strings.Split(routeString, ROUTE_ELEMENT_SEPARATOR)
+	splitRouteString := strings.Split(routeString, const_route_element_separator)
 
 	// Start parsing parts ( ommit root ( part : ``, route : `/` ) with 1: )
 	for _, v := range splitRouteString[1:] {
@@ -134,11 +134,11 @@ func (r *router) FindNodeByRoute(routeString string) (routerNode, map[string]str
 	routeVariableMap := make(map[string]string)
 
 	// Check root
-	if routeString == ROUTE_ELEMENT_SEPARATOR {
+	if routeString == const_route_element_separator {
 		return r.rootNode, routeVariableMap, nil
 	}
 
-	splitRouteString := strings.Split(routeString, ROUTE_ELEMENT_SEPARATOR)
+	splitRouteString := strings.Split(routeString, const_route_element_separator)
 
 	// Start parsing parts ( ommit root ( part : ``, route : `/` ) with 1: )
 	currentRouterNode := r.rootNode
