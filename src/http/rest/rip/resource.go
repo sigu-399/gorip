@@ -9,7 +9,7 @@
 // 
 // created      	07-03-2013
 
-package gorip
+package rip
 
 import (
 	"bytes"

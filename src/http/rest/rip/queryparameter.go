@@ -9,7 +9,7 @@
 // 
 // created      	09-03-2013
 
-package gorip
+package rip
 
 import (
 	"strconv"
