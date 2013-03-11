@@ -1,7 +1,7 @@
 PACKAGE
 
 package rip
-    import "net/http/rest/gorip"
+    import "net/http/rest/rip"
 
 
 CONSTANTS
