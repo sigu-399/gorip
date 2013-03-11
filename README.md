@@ -1,4 +1,4 @@
-# gorip
+# rip
 
 ( Go REST In Peace )
 
@@ -14,7 +14,7 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"gorip"
+	"net/http/rest/rip"
 	"net/http"
 	"strconv"
 )
@@ -33,19 +33,19 @@ func (v *ResourceIdValidator) Matches(value string) bool {
 	return id > 0
 }
 
-// Declares our resource called THING. Must match the gorip.Resource interface.
+// Declares our resource called THING. Must match the rip.Resource interface.
 type ResourceThingGET struct {
 }
 
 // Factory, must return an new instance of itself.
 // So each new API call will create a new instance of this resource.
-func (r *ResourceThingGET) Factory() gorip.Resource {
+func (r *ResourceThingGET) Factory() rip.Resource {
 	return &ResourceThingGET{}
 }
 
 // Wich method do you implement ? here, it is a GET
 func (r *ResourceThingGET) GetMethod() string {
-	return gorip.HttpMethodGET
+	return rip.HttpMethodGET
 }
 
 // Allowed Content-Type IN ( None since a GET does not have a body, so no content type)
@@ -58,15 +58,15 @@ func (r *ResourceThingGET) GetContentTypeOut() []string {
 	return []string{`text/plain`}
 }
 
-func (r *ResourceThingGET) GetQueryParameters() map[string]gorip.QueryParameter {
-	return map[string]gorip.QueryParameter{
-		"who": gorip.QueryParameter{Kind: gorip.QueryParameterString, DefaultValue: "World"}}
+func (r *ResourceThingGET) GetQueryParameters() map[string]rip.QueryParameter {
+	return map[string]rip.QueryParameter{
+		"who": rip.QueryParameter{Kind: rip.QueryParameterString, DefaultValue: "World"}}
 }
 
 // The implementation of the endpoint
-func (r *ResourceThingGET) Execute(context *gorip.ResourceContext) gorip.ResourceResult {
+func (r *ResourceThingGET) Execute(context *rip.ResourceContext) rip.ResourceResult {
 	fmt.Printf("context %s\n", context)
-	return gorip.ResourceResult{HttpStatus: http.StatusOK, Body: bytes.NewBufferString(fmt.Sprintf(`Hello %s !`, context.QueryParameters["who"]))}
+	return rip.ResourceResult{HttpStatus: http.StatusOK, Body: bytes.NewBufferString(fmt.Sprintf(`Hello %s !`, context.QueryParameters["who"]))}
 }
 
 func main() {
@@ -74,13 +74,13 @@ func main() {
 	var err error
 
 	// Creates a server listening to everything on port 8080
-	server := gorip.NewServer("/", ":8080")
+	server := rip.NewServer("/", ":8080")
 
 	// Registers the validator, so we can use it to register dynamic routes
 	server.RegisterRouteVariableValidator("id", &ResourceIdValidator{})
 
 	// Register an endpoint, ex /things/4, things/890 ...
-	endpointThing := gorip.NewEndpoint("/things/{thing_id:id}")
+	endpointThing := rip.NewEndpoint("/things/{thing_id:id}")
 	endpointThing.AddResource(&ResourceThingGET{})
 	// Here you could add more resource to this endpoint...
 
