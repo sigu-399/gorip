@@ -1,4 +1,4 @@
-# rip
+# gorip
 
 ( Go REST In Peace )
 
