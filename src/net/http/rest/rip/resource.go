@@ -22,6 +22,7 @@ type Resource interface {
 	GetContentTypeIn() []string
 	GetContentTypeOut() []string
 	GetQueryParameters() map[string]QueryParameter
+	GetCustomDocumentation() string
 }
 
 type ResourceContext struct {
