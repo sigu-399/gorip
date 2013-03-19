@@ -70,6 +70,10 @@ func (s *Server) serveDocumentationRecursive(currentPath string, currentNode rou
 			for key, q := range qps {
 				buffer.WriteString(`<p>QueryParam : ` + key + ` [type ` + q.Kind + `][default ` + q.DefaultValue + `]</p>`)
 			}
+
+			buffer.WriteString(`<h3>Custom infos</h3>`)
+			buffer.WriteString(`<p>` + r.GetCustomDocumentation() + `</p>`)
+
 		}
 	}
 
