@@ -25,6 +25,9 @@ type Server struct {
 	pattern string
 	address string
 	router  *router
+
+	documentationEndpointEnabled bool
+	documentationEndpointUrl     string
 }
 
 func NewServer(pattern string, address string) *Server {
@@ -47,6 +50,12 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	resourceContext := ResourceContext{}
 
 	log.Printf("Requesting %s %s", method, urlPath)
+
+	// Check if the documentation endpoint is enabled
+	if s.documentationEndpointEnabled && s.documentationEndpointUrl == urlPath {
+		s.serveDocumentation(writer)
+		return
+	}
 
 	// Find route node and associated route variables
 	node, routeVariables, err := s.router.FindNodeByRoute(urlPath)
@@ -211,6 +220,11 @@ func (s *Server) RegisterEndpoint(e *endpoint) error {
 
 	log.Printf("Registering endpoint : %s\n", e.GetRoute())
 	return s.router.RegisterEndpoint(e)
+}
+
+func (s *Server) RegisterDocumentationEndpoint(url string) {
+	s.documentationEndpointEnabled = true
+	s.documentationEndpointUrl = url
 }
 
 func (s *Server) RegisterRouteVariableValidator(kind string, validator RouteVariableValidator) error {
