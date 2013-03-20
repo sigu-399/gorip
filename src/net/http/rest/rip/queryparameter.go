@@ -13,6 +13,7 @@ package rip
 
 import (
 	"strconv"
+	"strings/validation"
 )
 
 const (
@@ -23,8 +24,9 @@ const (
 )
 
 type QueryParameter struct {
-	Kind         string
-	DefaultValue string
+	Kind             string
+	DefaultValue     string
+	FormatValidation validation.Validator
 }
 
 func (q *QueryParameter) IsValidType(value string) bool {
