@@ -24,9 +24,9 @@ const (
 )
 
 type QueryParameter struct {
-	Kind             string
-	DefaultValue     string
-	FormatValidation validation.Validator
+	Kind            string
+	DefaultValue    string
+	FormatValidator validation.Validator
 }
 
 func (q *QueryParameter) IsValidType(value string) bool {
