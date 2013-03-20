@@ -185,7 +185,7 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 												} else {
 
 													// Validate query param													
-													validator := qpObject.FormatValidation
+													validator := qpObject.FormatValidator
 													if validator != nil {
 														if !validator.IsValid(qpValue) {
 															message := fmt.Sprintf("Query Parameter is invalid : ", validator.GetErrorMessage())
