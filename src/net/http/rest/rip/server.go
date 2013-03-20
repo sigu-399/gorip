@@ -168,7 +168,7 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 												qpValue := urlValues.Get(qpKey)
 												if qpValue == `` {
 													qpValue = qpObject.DefaultValue
-													if !qpObject.IsValid(qpValue) {
+													if !qpObject.IsValidType(qpValue) {
 														message := fmt.Sprintf("Query parameter %s default value must be of kind %s", qpKey, qpObject.Kind)
 														log.Printf(message)
 														s.renderResourceResult(writer, &ResourceResult{HttpStatus: http.StatusBadRequest, Body: bytes.NewBufferString(message)}, `text/plain`)
@@ -176,7 +176,7 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 														break
 													}
 												}
-												if !qpObject.IsValid(qpValue) {
+												if !qpObject.IsValidType(qpValue) {
 													message := fmt.Sprintf("Query parameter %s must be of kind %s", qpKey, qpObject.Kind)
 													log.Printf(message)
 													s.renderResourceResult(writer, &ResourceResult{HttpStatus: http.StatusBadRequest, Body: bytes.NewBufferString(message)}, `text/plain`)

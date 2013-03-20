@@ -27,7 +27,7 @@ type QueryParameter struct {
 	DefaultValue string
 }
 
-func (q *QueryParameter) IsValid(value string) bool {
+func (q *QueryParameter) IsValidType(value string) bool {
 
 	switch q.Kind {
 
