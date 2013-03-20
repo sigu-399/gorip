@@ -188,7 +188,7 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 													validator := qpObject.FormatValidator
 													if validator != nil {
 														if !validator.IsValid(qpValue) {
-															message := fmt.Sprintf("Query Parameter is invalid : ", validator.GetErrorMessage())
+															message := fmt.Sprintf("Invalid Query Parameter, %s", validator.GetErrorMessage())
 															log.Printf(message)
 															s.renderResourceResult(writer, &ResourceResult{HttpStatus: http.StatusBadRequest, Body: bytes.NewBufferString(message)}, `text/plain`)
 															break
