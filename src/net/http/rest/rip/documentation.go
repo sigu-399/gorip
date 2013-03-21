@@ -68,10 +68,11 @@ func (s *Server) serveDocumentationRecursive(currentPath string, currentNode rou
 
 			qps := r.GetQueryParameters()
 			for key, q := range qps {
-				buffer.WriteString(`<p>QueryParam : ` + key + ` [type ` + q.Kind + `][default ` + q.DefaultValue + `]</p>`)
+				buffer.WriteString(`<p>QueryParam : ` + key + ` [type ` + q.Kind + `][default ` + q.DefaultValue + `]`)
 				if q.FormatValidator != nil {
-					buffer.WriteString(`<p>QueryParam ` + key + ` Validator : ` + q.FormatValidator.GetErrorMessage() + `</p>`)
+					buffer.WriteString(` Validator : ` + q.FormatValidator.GetErrorMessage())
 				}
+				buffer.WriteString(`</p>`)
 			}
 
 			buffer.WriteString(`<h3>Custom infos</h3>`)
