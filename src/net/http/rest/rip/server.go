@@ -13,6 +13,9 @@ package rip
 
 import (
 	"bytes"
+	"crypto/sha1"
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -49,7 +52,15 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 
 	resourceContext := ResourceContext{}
 
-	log.Printf("Requesting %s %s", method, urlPath)
+	// Generate request id
+	hasher := sha1.New()
+	hasher.Write([]byte(timeStart.String()))
+	requestId := base64.URLEncoding.EncodeToString(hasher.Sum(nil))
+
+	log.Printf("[%s] Request %s %s", requestId, method, urlPath)
+
+	jsonRequest, _ := json.Marshal(request)
+	log.Printf("[%s] Request dump : %s", requestId, jsonRequest)
 
 	// Check if the documentation endpoint is enabled
 	if s.documentationEndpointEnabled && s.documentationEndpointUrl == urlPath {
@@ -63,13 +74,13 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	if err != nil {
 		message := err.Error()
 		log.Printf(message)
-		s.renderResourceResult(writer, &ResourceResult{HttpStatus: http.StatusBadRequest, Body: bytes.NewBufferString(message)}, `text/plain`)
+		s.renderResourceResult(writer, &ResourceResult{HttpStatus: http.StatusBadRequest, Body: bytes.NewBufferString(message)}, `text/plain`, requestId)
 	}
 
 	if node == nil {
-		message := fmt.Sprintf("Could not find route for %s", urlPath)
+		message := fmt.Sprintf("[%s] Could not find route for %s", requestId, urlPath)
 		log.Printf(message)
-		s.renderResourceResult(writer, &ResourceResult{HttpStatus: http.StatusBadRequest, Body: bytes.NewBufferString(message)}, `text/plain`)
+		s.renderResourceResult(writer, &ResourceResult{HttpStatus: http.StatusBadRequest, Body: bytes.NewBufferString(message)}, `text/plain`, requestId)
 	} else {
 
 		// Route was found:
@@ -78,9 +89,9 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 		resourceContext.RouteVariables = routeVariables
 
 		if node.GetEndpoint() == nil {
-			message := fmt.Sprintf("No endpoint found for this route %s", urlPath)
+			message := fmt.Sprintf("[%s] No endpoint found for this route %s", requestId, urlPath)
 			log.Printf(message)
-			s.renderResourceResult(writer, &ResourceResult{HttpStatus: http.StatusInternalServerError, Body: bytes.NewBufferString(message)}, `text/plain`)
+			s.renderResourceResult(writer, &ResourceResult{HttpStatus: http.StatusInternalServerError, Body: bytes.NewBufferString(message)}, `text/plain`, requestId)
 		} else {
 
 			// Endpoint was found:
@@ -89,22 +100,22 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 
 			contentTypeParser, err := newContentTypeHeaderParser(request.Header.Get(`Content-Type`))
 			if err != nil {
-				message := fmt.Sprintf("Invalid Content-Type header : %s", err.Error())
+				message := fmt.Sprintf("[%s] Invalid Content-Type header : %s", requestId, err.Error())
 				log.Printf(message)
-				s.renderResourceResult(writer, &ResourceResult{HttpStatus: http.StatusBadRequest, Body: bytes.NewBufferString(message)}, `text/plain`)
+				s.renderResourceResult(writer, &ResourceResult{HttpStatus: http.StatusBadRequest, Body: bytes.NewBufferString(message)}, `text/plain`, requestId)
 			} else {
 
 				acceptParser, err := newAcceptHeaderParser(request.Header.Get(`Accept`))
 				if err != nil {
-					message := fmt.Sprintf("Invalid Accept header : %s", err.Error())
+					message := fmt.Sprintf("[%s] Invalid Accept header : %s", requestId, err.Error())
 					log.Printf(message)
-					s.renderResourceResult(writer, &ResourceResult{HttpStatus: http.StatusBadRequest, Body: bytes.NewBufferString(message)}, `text/plain`)
+					s.renderResourceResult(writer, &ResourceResult{HttpStatus: http.StatusBadRequest, Body: bytes.NewBufferString(message)}, `text/plain`, requestId)
 				} else {
 
 					if !acceptParser.HasAcceptElement() {
-						message := fmt.Sprintf("No valid Accept header was given")
+						message := fmt.Sprintf("[%s] No valid Accept header was given", requestId)
 						log.Printf(message)
-						s.renderResourceResult(writer, &ResourceResult{HttpStatus: http.StatusBadRequest, Body: bytes.NewBufferString(message)}, `text/plain`)
+						s.renderResourceResult(writer, &ResourceResult{HttpStatus: http.StatusBadRequest, Body: bytes.NewBufferString(message)}, `text/plain`, requestId)
 					} else {
 
 						// Headers are OK:
@@ -113,17 +124,17 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 						availableResourceImplementations := endp.GetResources()
 
 						if len(availableResourceImplementations) == 0 {
-							message := fmt.Sprintf("No resource found on this route %s", urlPath)
+							message := fmt.Sprintf("[%s] No resource found on this route %s", requestId, urlPath)
 							log.Printf(message)
-							s.renderResourceResult(writer, &ResourceResult{HttpStatus: http.StatusInternalServerError, Body: bytes.NewBufferString(message)}, `text/plain`)
+							s.renderResourceResult(writer, &ResourceResult{HttpStatus: http.StatusInternalServerError, Body: bytes.NewBufferString(message)}, `text/plain`, requestId)
 						} else {
 
 							matchingResource, contentTypeIn, contentTypeOut := endp.FindMatchingResource(method, &contentTypeParser, &acceptParser)
 
 							if matchingResource == nil {
-								message := fmt.Sprintf("No available resource for this Content-Type")
+								message := fmt.Sprintf("[%s] No available resource for this Content-Type", requestId)
 								log.Printf(message)
-								s.renderResourceResult(writer, &ResourceResult{HttpStatus: http.StatusBadRequest, Body: bytes.NewBufferString(message)}, `text/plain`)
+								s.renderResourceResult(writer, &ResourceResult{HttpStatus: http.StatusBadRequest, Body: bytes.NewBufferString(message)}, `text/plain`, requestId)
 							} else {
 
 								// Found a matching resource implementation: 
@@ -136,15 +147,15 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 
 								bodyInBytes, err := ioutil.ReadAll(request.Body)
 								if err != nil {
-									message := fmt.Sprintf("Could not read request body")
+									message := fmt.Sprintf("[%s] Could not read request body", requestId)
 									log.Printf(message)
-									s.renderResourceResult(writer, &ResourceResult{HttpStatus: http.StatusInternalServerError, Body: bytes.NewBufferString(message)}, `text/plain`)
+									s.renderResourceResult(writer, &ResourceResult{HttpStatus: http.StatusInternalServerError, Body: bytes.NewBufferString(message)}, `text/plain`, requestId)
 								} else {
 
 									if resourceContext.ContentTypeIn == nil && len(bodyInBytes) > 0 {
-										message := fmt.Sprintf("Body is not allowed for this resource")
+										message := fmt.Sprintf("[%s] Body is not allowed for this resource", requestId)
 										log.Printf(message)
-										s.renderResourceResult(writer, &ResourceResult{HttpStatus: http.StatusBadRequest, Body: bytes.NewBufferString(message)}, `text/plain`)
+										s.renderResourceResult(writer, &ResourceResult{HttpStatus: http.StatusBadRequest, Body: bytes.NewBufferString(message)}, `text/plain`, requestId)
 									} else {
 
 										resourceContext.Body = bytes.NewBuffer(bodyInBytes)
@@ -152,9 +163,9 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 										// Create a new instance from factory and executes it
 										resource := matchingResource.Factory()
 										if resource == nil {
-											message := fmt.Sprintf("Resource factory must instanciate a valid Resource")
+											message := fmt.Sprintf("[%s] Resource factory must instanciate a valid Resource", requestId)
 											log.Printf(message)
-											s.renderResourceResult(writer, &ResourceResult{HttpStatus: http.StatusInternalServerError, Body: bytes.NewBufferString(message)}, `text/plain`)
+											s.renderResourceResult(writer, &ResourceResult{HttpStatus: http.StatusInternalServerError, Body: bytes.NewBufferString(message)}, `text/plain`, requestId)
 										} else {
 
 											// Check and provide query parameters
@@ -169,17 +180,17 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 												if qpValue == `` {
 													qpValue = qpObject.DefaultValue
 													if !qpObject.IsValidType(qpValue) {
-														message := fmt.Sprintf("Query parameter %s default value must be of kind %s", qpKey, qpObject.Kind)
+														message := fmt.Sprintf("[%s] Query parameter %s default value must be of kind %s", requestId, qpKey, qpObject.Kind)
 														log.Printf(message)
-														s.renderResourceResult(writer, &ResourceResult{HttpStatus: http.StatusBadRequest, Body: bytes.NewBufferString(message)}, `text/plain`)
+														s.renderResourceResult(writer, &ResourceResult{HttpStatus: http.StatusBadRequest, Body: bytes.NewBufferString(message)}, `text/plain`, requestId)
 														queryParameterOk = false
 														break
 													}
 												}
 												if !qpObject.IsValidType(qpValue) {
-													message := fmt.Sprintf("Query parameter %s must be of kind %s", qpKey, qpObject.Kind)
+													message := fmt.Sprintf("[%s] Query parameter %s must be of kind %s", requestId, qpKey, qpObject.Kind)
 													log.Printf(message)
-													s.renderResourceResult(writer, &ResourceResult{HttpStatus: http.StatusBadRequest, Body: bytes.NewBufferString(message)}, `text/plain`)
+													s.renderResourceResult(writer, &ResourceResult{HttpStatus: http.StatusBadRequest, Body: bytes.NewBufferString(message)}, `text/plain`, requestId)
 													queryParameterOk = false
 													break
 												} else {
@@ -188,9 +199,9 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 													validator := qpObject.FormatValidator
 													if validator != nil {
 														if !validator.IsValid(qpValue) {
-															message := fmt.Sprintf("Invalid Query Parameter, %s", validator.GetErrorMessage())
+															message := fmt.Sprintf("[%s] Invalid Query Parameter, %s", requestId, validator.GetErrorMessage())
 															log.Printf(message)
-															s.renderResourceResult(writer, &ResourceResult{HttpStatus: http.StatusBadRequest, Body: bytes.NewBufferString(message)}, `text/plain`)
+															s.renderResourceResult(writer, &ResourceResult{HttpStatus: http.StatusBadRequest, Body: bytes.NewBufferString(message)}, `text/plain`, requestId)
 															break
 														}
 													}
@@ -203,7 +214,7 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 											// Finally...
 											if queryParameterOk {
 												result := resource.Execute(&resourceContext)
-												s.renderResourceResult(writer, &result, *resourceContext.ContentTypeOut)
+												s.renderResourceResult(writer, &result, *resourceContext.ContentTypeOut, requestId)
 											}
 										}
 									}
@@ -219,7 +230,7 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	timeEnd := time.Now()
 	durationMs := timeEnd.Sub(timeStart).Seconds() * 1000
 
-	log.Printf("Response time : %2.2f ms", durationMs)
+	log.Printf("[%s] Response time : %2.2f ms", requestId, durationMs)
 
 }
 
@@ -242,7 +253,7 @@ func (s *Server) RegisterRouteVariableValidator(kind string, validator RouteVari
 	return s.router.RegisterRouteVariableValidator(kind, validator)
 }
 
-func (s *Server) renderResourceResult(writer http.ResponseWriter, result *ResourceResult, contentType string) {
+func (s *Server) renderResourceResult(writer http.ResponseWriter, result *ResourceResult, contentType string, requestId string) {
 
 	bodyOutLen := 0
 	if result.Body != nil {
@@ -260,8 +271,11 @@ func (s *Server) renderResourceResult(writer http.ResponseWriter, result *Resour
 	if bodyOutLen > 0 {
 		_, err := result.Body.WriteTo(writer)
 		if err != nil {
-			log.Printf("Error while writing the body %s", err.Error())
+			log.Printf("[%s] Error while writing the body %s", requestId, err.Error())
 		}
 	}
+
+	jsonResult, _ := json.Marshal(result)
+	log.Printf("[%s] Response result : %s", requestId, jsonResult)
 
 }
