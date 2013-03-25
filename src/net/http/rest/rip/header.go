@@ -52,13 +52,13 @@ func (p *contentTypeHeaderParser) parse(value string) error {
 			if strings.HasPrefix(trimmedCharset, `charset=`) {
 				splitCharset := strings.Split(trimmedCharset, `=`)
 				if len(splitCharset) == 2 {
-					// TODO : check charsets ?
+					// TODO : check charsets ? other types ( multipart )
 					p.charset = &splitCharset[1]
 				} else {
-					return errors.New(`Invalid Content-Type parameter : expecting key-value charset`)
+					// return errors.New(`Invalid Content-Type parameter : expecting key-value charset`)
 				}
 			} else {
-				return errors.New(`Invalid Content-Type parameter : expecting charset`)
+				// return errors.New(`Invalid Content-Type parameter : expecting charset`)
 			}
 
 		}
