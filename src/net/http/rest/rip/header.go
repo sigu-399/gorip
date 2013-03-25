@@ -20,11 +20,13 @@ import (
 
 type contentTypeHeaderParser struct {
 	contentType *string
-	charset     *string
+	parameters  map[string]string
 }
 
 func newContentTypeHeaderParser(value string) (contentTypeHeaderParser, error) {
 	p := contentTypeHeaderParser{}
+	p.parameters = make(map[string]string)
+
 	err := p.parse(value)
 	if err != nil {
 		return contentTypeHeaderParser{}, err
@@ -48,19 +50,15 @@ func (p *contentTypeHeaderParser) parse(value string) error {
 			trimmed := strings.TrimSpace(split[0])
 			p.contentType = &trimmed
 
-			trimmedCharset := strings.TrimSpace(split[1])
-			if strings.HasPrefix(trimmedCharset, `charset=`) {
-				splitCharset := strings.Split(trimmedCharset, `=`)
-				if len(splitCharset) == 2 {
-					// TODO : check charsets ? other types ( multipart )
-					p.charset = &splitCharset[1]
+			for i := 1; i != len(split); i++ {
+				trimmedParameter := strings.TrimSpace(split[i])
+				splitParameter := strings.Split(trimmedParameter, `=`)
+				if len(splitParameter) == 2 {
+					p.parameters[splitParameter[0]] = splitParameter[1]
 				} else {
-					// return errors.New(`Invalid Content-Type parameter : expecting key-value charset`)
+					return errors.New(`Invalid Content-Type parameter : expecting key-value`)
 				}
-			} else {
-				// return errors.New(`Invalid Content-Type parameter : expecting charset`)
 			}
-
 		}
 	}
 
@@ -71,16 +69,8 @@ func (p *contentTypeHeaderParser) HasContentType() bool {
 	return p.contentType != nil
 }
 
-func (p *contentTypeHeaderParser) HasCharset() bool {
-	return p.charset != nil
-}
-
 func (p *contentTypeHeaderParser) GetContentType() string {
 	return *p.contentType
-}
-
-func (p *contentTypeHeaderParser) GetCharset() string {
-	return *p.charset
 }
 
 type acceptHeaderParser struct {
