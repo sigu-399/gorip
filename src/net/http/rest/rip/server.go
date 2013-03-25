@@ -242,11 +242,16 @@ func (s *Server) RegisterEndpoint(e *endpoint) error {
 
 	log.Printf("Registering endpoint : %s\n", e.GetRoute())
 	return s.router.RegisterEndpoint(e)
+
 }
 
 func (s *Server) RegisterDocumentationEndpoint(url string) {
+
+	log.Printf("Registering documentation : %s\n", url)
+
 	s.documentationEndpointEnabled = true
 	s.documentationEndpointUrl = url
+
 }
 
 func (s *Server) RegisterRouteVariableValidator(kind string, validator RouteVariableValidator) error {
