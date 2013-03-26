@@ -9,14 +9,15 @@ REST Server Framework written in Go language
 Completed YES
 
 ## Usage
+
 ```
 package main
 
 import (
 	"bytes"
 	"fmt"
-	"net/http/rest/rip"
 	"net/http"
+	"net/http/rest/rip"
 	"strconv"
 )
 
@@ -36,6 +37,11 @@ func (v *ResourceIdValidator) Matches(value string) bool {
 
 // Declares our resource called THING. Must match the rip.Resource interface.
 type ResourceThingGET struct {
+}
+
+// Used by documentation
+func (r *ResourceThingGET) GetCustomDocumentation() string {
+	return "Some documentation here... Thing resource..."
 }
 
 // Factory, must return an new instance of itself.
@@ -93,5 +99,4 @@ func main() {
 	// Starts the server
 	server.ListenAndServe()
 }
-
 ```
