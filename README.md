@@ -5,7 +5,8 @@
 REST Server Framework written in Go language
 
 ## Status
-Work in progress ( 90% done )
+
+Completed YES
 
 ## Usage
 ```
