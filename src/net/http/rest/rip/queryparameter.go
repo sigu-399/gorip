@@ -23,11 +23,11 @@
 // 
 // created      	09-03-2013
 
-package rip
+package gorip
 
 import (
+	"github.com/sigu-399/goformatvalidation"
 	"strconv"
-	"strings/validation"
 )
 
 const (

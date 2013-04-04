@@ -23,7 +23,7 @@
 // 
 // created      	04-03-2013
 
-package rip
+package gorip
 
 import (
 	"errors"

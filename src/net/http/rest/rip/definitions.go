@@ -23,7 +23,7 @@
 // 
 // created      	08-03-2013
 
-package rip
+package gorip
 
 const (
 	HttpMethodGET     = "GET"

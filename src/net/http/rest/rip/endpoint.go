@@ -24,7 +24,7 @@
 // 
 // created      	07-03-2013
 
-package rip
+package gorip
 
 import ()
 
