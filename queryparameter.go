@@ -40,7 +40,7 @@ const (
 type QueryParameter struct {
 	Kind            string
 	DefaultValue    string
-	FormatValidator validation.Validator
+	FormatValidator goformatvalidation.Validator
 }
 
 func (q *QueryParameter) IsValidType(value string) bool {
