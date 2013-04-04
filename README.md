@@ -17,7 +17,7 @@ import (
 	"bytes"
 	"fmt"
 	"net/http"
-	"net/http/rest/rip"
+	rip "github.com/sigu-399/gorip"
 	"strconv"
 )
 
