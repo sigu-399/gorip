@@ -6,7 +6,7 @@ REST Server Framework written in Go language
 
 ## Status
 
-Completed YES
+Completed & Tested : v 1.0
 
 ## Usage
 
@@ -50,7 +50,7 @@ func (r *ResourceThingGET) Factory() rip.Resource {
 	return &ResourceThingGET{}
 }
 
-// Wich method do you implement ? here, it is a GET
+// Which method do you implement ? here, it is a GET
 func (r *ResourceThingGET) GetMethod() string {
 	return rip.HttpMethodGET
 }
@@ -65,6 +65,7 @@ func (r *ResourceThingGET) GetContentTypeOut() []string {
 	return []string{`text/plain`}
 }
 
+// A query parameter is a variable given in the Url, for example /things/4?who=john
 func (r *ResourceThingGET) GetQueryParameters() map[string]rip.QueryParameter {
 	return map[string]rip.QueryParameter{
 		"who": rip.QueryParameter{Kind: rip.QueryParameterString, DefaultValue: "World"}}
