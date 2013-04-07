@@ -12,17 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// author  			sigu-399
-// author-github 	https://github.com/sigu-399
-// author-mail		sigu.399@gmail.com
+// author           sigu-399
+// author-github    https://github.com/sigu-399
+// author-mail      sigu.399@gmail.com
 // 
-// repository-name	gorip
+// repository-nam   gorip
 // repository-desc  REST Server Framework - ( gorip: REST In Peace ) - Go language
 // 
-// description		Defines a REST endpoint.
-//					An endpoint is a url route and associated resources.
+// description      Defines a REST endpoint.
+//                  An endpoint is a url route and associated resources.
 // 
-// created      	07-03-2013
+// created          07-03-2013
 
 package gorip
 

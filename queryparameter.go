@@ -12,16 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// author  			sigu-399
-// author-github 	https://github.com/sigu-399
-// author-mail		sigu.399@gmail.com
+// author           sigu-399
+// author-github    https://github.com/sigu-399
+// author-mail      sigu.399@gmail.com
 // 
-// repository-name	gorip
+// repository-nam   gorip
 // repository-desc  REST Server Framework - ( gorip: REST In Peace ) - Go language
 // 
-// description	    Query parameters are variables given in the url.
+// description      Query parameters are variables given in the url.
 // 
-// created      	09-03-2013
+// created          09-03-2013
 
 package gorip
 
