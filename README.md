@@ -97,6 +97,9 @@ func main() {
 		panic(err.Error())
 	}
 
+	// Registers a documentation endpoint
+	server.RegisterDocumentationEndpoint("/documentation")
+
 	// Starts the server
 	server.ListenAndServe()
 }
