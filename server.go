@@ -268,8 +268,8 @@ func (s *Server) RegisterDocumentationEndpoint(url string) {
 
 }
 
-func (s *Server) RegisterRouteVariableValidator(kind string, validator RouteVariableValidator) error {
-	return s.router.RegisterRouteVariableValidator(kind, validator)
+func (s *Server) RegisterRouteVariableType(kind string, rvtype RouteVariableType) error {
+	return s.router.RegisterRouteVariableType(kind, rvtype)
 }
 
 func (s *Server) renderResourceResult(writer http.ResponseWriter, result *ResourceResult, contentType string, requestId string) {

@@ -15,12 +15,12 @@
 // author           sigu-399
 // author-github    https://github.com/sigu-399
 // author-mail      sigu.399@gmail.com
-// 
+//
 // repository-name  gorip
 // repository-desc  REST Server Framework - ( gorip: REST In Peace ) - Go language
-// 
+//
 // description      Server's router implementation.
-// 
+//
 // created          04-03-2013
 
 package gorip
@@ -39,13 +39,13 @@ const (
 )
 
 type router struct {
-	rootNode                routerNode
-	routeVariableValidators map[string]RouteVariableValidator
+	rootNode           routerNode
+	RouteVariableTypes map[string]RouteVariableType
 }
 
 func newRouter() *router {
 	r := &router{}
-	r.routeVariableValidators = make(map[string]RouteVariableValidator)
+	r.RouteVariableTypes = make(map[string]RouteVariableType)
 	r.rootNode = newRouterNodeInvariable(r, const_route_node_part)
 	return r
 }
@@ -81,7 +81,7 @@ func (r *router) RegisterEndpoint(endp *endpoint) error {
 				if err != nil {
 					return err
 				} else {
-					if r.GetRouteVariableValidatorByKind(rvKind) == nil {
+					if r.GetRouteVariableTypeByKind(rvKind) == nil {
 						return errors.New(fmt.Sprintf("Given route uses a route variable kind '%s' that was not registered", rvKind))
 					} else {
 						newChild = newRouterNodeVariable(r, v, rvIdentifier, rvKind)
@@ -119,23 +119,23 @@ func (r *router) RegisterEndpoint(endp *endpoint) error {
 }
 
 // Adds a route variable validator to the router
-func (r *router) RegisterRouteVariableValidator(kind string, validator RouteVariableValidator) error {
+func (r *router) RegisterRouteVariableType(kind string, rvType RouteVariableType) error {
 
-	log.Printf("Registering route variable validator of kind '%s'\n", kind)
+	log.Printf("Registering route variable type with kind '%s'\n", kind)
 
-	if r.GetRouteVariableValidatorByKind(kind) != nil {
-		return errors.New(fmt.Sprintf(`Route variable validator of kind '%s' already exists`, kind))
+	if r.GetRouteVariableTypeByKind(kind) != nil {
+		return errors.New(fmt.Sprintf(`Route variable variable type with kind '%s' already exists`, kind))
 	} else {
-		r.routeVariableValidators[kind] = validator
+		r.RouteVariableTypes[kind] = rvType
 	}
 
 	return nil
 }
 
-func (r *router) GetRouteVariableValidatorByKind(kind string) RouteVariableValidator {
+func (r *router) GetRouteVariableTypeByKind(kind string) RouteVariableType {
 
-	if _, ok := r.routeVariableValidators[kind]; ok {
-		return r.routeVariableValidators[kind]
+	if _, ok := r.RouteVariableTypes[kind]; ok {
+		return r.RouteVariableTypes[kind]
 	}
 
 	return nil
@@ -221,7 +221,7 @@ type routerNodeImplementation struct {
 	endp         *endpoint
 }
 
-// Initialize the interface implementation of routerNode, 
+// Initialize the interface implementation of routerNode,
 // must be called as a constructor function by all the sub structs implementing the routerNode interface
 func (rni *routerNodeImplementation) Initialize(r *router, part string, isVariable bool) *routerNodeImplementation {
 	rni.part = part
@@ -278,7 +278,7 @@ func (rni *routerNodeImplementation) GetChildByPart(part string, invariableMode 
 			switch child.(type) {
 			case *routerNodeVariable:
 				variable := child.(*routerNodeVariable)
-				validator := child.GetRouter().GetRouteVariableValidatorByKind(variable.kind)
+				validator := child.GetRouter().GetRouteVariableTypeByKind(variable.kind)
 				if validator.Matches(part) {
 					if nodeFound != nil {
 						log.Printf("Warning : Multiple routings for a given route")
@@ -324,7 +324,7 @@ func newRouterNodeVariable(r *router, part string, identifier string, kind strin
 	return rnva
 }
 
-type RouteVariableValidator interface {
+type RouteVariableType interface {
 	Matches(string) bool
 }
 
