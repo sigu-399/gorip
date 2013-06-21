@@ -47,8 +47,9 @@ type Server struct {
 	documentationEndpointEnabled bool
 	documentationEndpointUrl     string
 
-	debugEnableRequestDump       bool
-	debugEnableRequestIdentifier bool
+	debugEnableLogRequestDump       bool
+	debugEnableLogRequestIdentifier bool
+	debugEnableLogRequestDuration   bool
 }
 
 func NewServer(pattern string, address string) *Server {
@@ -75,12 +76,16 @@ func (s *Server) NewEndpoint(route string, resources ...Resource) error {
 	return s.router.NewEndpoint(endp)
 }
 
-func (s *Server) DebugEnableRequestDump(b bool) {
-	s.debugEnableRequestDump = b
+func (s *Server) DebugEnableLogRequestDump(b bool) {
+	s.debugEnableLogRequestDump = b
 }
 
-func (s *Server) DebugEnableRequestIdentifier(b bool) {
-	s.debugEnableRequestIdentifier = b
+func (s *Server) DebugEnableLogRequestIdentifier(b bool) {
+	s.debugEnableLogRequestIdentifier = b
+}
+
+func (s *Server) DebugEnableLogRequestDuration(b bool) {
+	s.debugEnableLogRequestDuration = b
 }
 
 func (s *Server) ListenAndServe() error {
@@ -99,34 +104,39 @@ func (s *Server) DebugPrintRouterTree() {
 
 }
 
+func (s *Server) EnableDocumentationEndpoint(url string) {
+
+	log.Printf("Enable documentation on endpoint %s\n", url)
+
+	s.documentationEndpointEnabled = true
+	s.documentationEndpointUrl = url
+
+}
+
 func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 
-	timeStart := time.Now()
+	var timeStart time.Time
+	var timeEnd time.Time
+
+	if s.debugEnableLogRequestDuration {
+		timeStart = time.Now()
+	}
+
+	requestId := "o" // No request id
+	if s.debugEnableLogRequestIdentifier {
+		requestId = s.generateRequestId(timeStart)
+	}
 
 	urlPath := request.URL.Path
 	method := request.Method
 
-	resourceContext := ResourceContext{}
-
-	requestId := "o" // No request id
-
-	if s.debugEnableRequestIdentifier {
-		// Generate request id
-		hasher := sha1.New()
-		hasher.Write([]byte(timeStart.String()))
-		requestId = base64.URLEncoding.EncodeToString(hasher.Sum(nil))
-	}
-
 	log.Printf("[%s] Request %s %s", requestId, method, urlPath)
 
-	if s.debugEnableRequestDump {
-		jsonRequest, _ := json.MarshalIndent(request, "", "")
-		log.Printf("[%s] === Request dump =================", requestId)
-		fmt.Printf("%s\n", jsonRequest)
-		log.Printf("[%s] === End of Request dump ==========", requestId)
+	if s.debugEnableLogRequestDump {
+		s.dumpRequest(request, requestId)
 	}
 
-	// Check if the documentation endpoint is enabled
+	// Serves documentation if requested and enabled
 	if s.documentationEndpointEnabled && s.documentationEndpointUrl == urlPath {
 		s.serveDocumentation(writer)
 		return
@@ -134,12 +144,13 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 
 	// Find route node and associated route variables
 	node, routeVariables, err := s.router.FindNodeByRoute(urlPath)
-
 	if err != nil {
-		message := err.Error()
-		log.Printf(message)
-		s.renderResourceResult(writer, &ResourceResult{HttpStatus: http.StatusBadRequest, Body: bytes.NewBufferString(message)}, `text/plain`, requestId)
+		errorMessage := err.Error()
+		log.Printf(errorMessage)
+		s.renderResourceResult(writer, &ResourceResult{HttpStatus: http.StatusBadRequest, Body: bytes.NewBufferString(errorMessage)}, `text/plain`, requestId)
 	}
+
+	resourceContext := ResourceContext{}
 
 	if node == nil {
 		message := fmt.Sprintf("[%s] Could not find route for %s", requestId, urlPath)
@@ -291,20 +302,24 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 		}
 	}
 
-	timeEnd := time.Now()
-	durationMs := timeEnd.Sub(timeStart).Seconds() * 1000
-
-	log.Printf("[%s] Response time : %2.2f ms", requestId, durationMs)
-
+	if s.debugEnableLogRequestDuration {
+		timeEnd = time.Now()
+		durationMs := timeEnd.Sub(timeStart).Seconds() * 1000
+		log.Printf("[%s] Response Duration : %2.2f ms", requestId, durationMs)
+	}
 }
 
-func (s *Server) EnableDocumentationEndpoint(url string) {
+func (s *Server) generateRequestId(t time.Time) string {
+	hasher := sha1.New()
+	hasher.Write([]byte(t.String()))
+	return base64.URLEncoding.EncodeToString(hasher.Sum(nil))
+}
 
-	log.Printf("Enable documentation on endpoint %s\n", url)
-
-	s.documentationEndpointEnabled = true
-	s.documentationEndpointUrl = url
-
+func (s *Server) dumpRequest(request *http.Request, requestId string) {
+	jsonRequest, _ := json.MarshalIndent(request, "", "")
+	log.Printf("[%s] === Request dump =================", requestId)
+	fmt.Printf("%s\n", jsonRequest)
+	log.Printf("[%s] === End of Request dump ==========", requestId)
 }
 
 func (s *Server) NewRouteVariableType(kind string, rvtype RouteVariableType) error {
