@@ -51,7 +51,7 @@ func newRouter() *router {
 }
 
 // Adds a endpoint to the router tree
-func (r *router) RegisterEndpoint(endp *endpoint) error {
+func (r *router) NewEndpoint(endp *endpoint) error {
 
 	routeString := endp.GetRoute()
 
@@ -82,7 +82,7 @@ func (r *router) RegisterEndpoint(endp *endpoint) error {
 					return err
 				} else {
 					if r.GetRouteVariableTypeByKind(rvKind) == nil {
-						return errors.New(fmt.Sprintf("Given route uses a route variable kind '%s' that was not registered", rvKind))
+						return errors.New(fmt.Sprintf("Given route uses an unknown route variable with kind '%s'", rvKind))
 					} else {
 						newChild = newRouterNodeVariable(r, v, rvIdentifier, rvKind)
 					}
@@ -119,9 +119,9 @@ func (r *router) RegisterEndpoint(endp *endpoint) error {
 }
 
 // Adds a route variable validator to the router
-func (r *router) RegisterRouteVariableType(kind string, rvType RouteVariableType) error {
+func (r *router) NewRouteVariableType(kind string, rvType RouteVariableType) error {
 
-	log.Printf("Registering route variable type with kind '%s'\n", kind)
+	log.Printf("New route variable type with kind '%s'\n", kind)
 
 	if r.GetRouteVariableTypeByKind(kind) != nil {
 		return errors.New(fmt.Sprintf(`Route variable variable type with kind '%s' already exists`, kind))

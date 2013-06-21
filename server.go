@@ -64,7 +64,9 @@ func (s *Server) NewEndpoint(route string, resources ...Resource) error {
 		endp.AddResource(res)
 	}
 
-	return s.registerEndpoint(endp)
+	log.Printf("New endpoint : %s\n", endp.GetRoute())
+
+	return s.router.NewEndpoint(endp)
 }
 
 func (s *Server) ListenAndServe() error {
@@ -264,17 +266,6 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 
 }
 
-func (s *Server) registerEndpoint(e *endpoint) error {
-
-	if e == nil {
-		panic(`Endpoint cannot be nil`)
-	}
-
-	log.Printf("Registering endpoint : %s\n", e.GetRoute())
-	return s.router.RegisterEndpoint(e)
-
-}
-
 func (s *Server) EnableDocumentationEndpoint(url string) {
 
 	log.Printf("Enable documentation on endpoint %s\n", url)
@@ -285,7 +276,7 @@ func (s *Server) EnableDocumentationEndpoint(url string) {
 }
 
 func (s *Server) NewRouteVariableType(kind string, rvtype RouteVariableType) error {
-	return s.router.RegisterRouteVariableType(kind, rvtype)
+	return s.router.NewRouteVariableType(kind, rvtype)
 }
 
 func (s *Server) renderResourceResult(writer http.ResponseWriter, result *ResourceResult, contentType string, requestId string) {
