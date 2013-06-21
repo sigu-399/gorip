@@ -32,9 +32,9 @@ import (
 type Resource interface {
 	Factory() Resource
 	Execute(context *ResourceContext) ResourceResult
-	GetSignature() *ResourceSignature
-	GetQueryParameters() map[string]QueryParameter
-	GetCustomDocumentation() string
+	Signature() *ResourceSignature
+	QueryParameters() map[string]QueryParameter
+	DocumentationNotes() string
 }
 
 type ResourceContext struct {

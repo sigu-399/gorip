@@ -207,7 +207,7 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 
 											queryParameterOk := true
 
-											for qpKey, qpObject := range resource.GetQueryParameters() {
+											for qpKey, qpObject := range resource.QueryParameters() {
 												qpValue := urlValues.Get(qpKey)
 												if qpValue == `` {
 													qpValue = qpObject.DefaultValue

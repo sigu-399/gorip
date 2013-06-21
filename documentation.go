@@ -76,13 +76,13 @@ func (s *Server) serveDocumentationRecursive(currentPath string, currentNode rou
 
 			buffer.WriteString(`<hr/>`)
 
-			signature := r.GetSignature()
+			signature := r.Signature()
 
 			buffer.WriteString(`<p>Method : ` + signature.Method + `</p>`)
 			buffer.WriteString(`<p>In : ` + strings.Join(signature.ContentTypeIn, `,`) + `</p>`)
 			buffer.WriteString(`<p>Out : ` + strings.Join(signature.ContentTypeOut, `,`) + `</p>`)
 
-			qps := r.GetQueryParameters()
+			qps := r.QueryParameters()
 			for key, q := range qps {
 				buffer.WriteString(`<p>QueryParam : ` + key + ` [type ` + q.Kind + `][default ` + q.DefaultValue + `]`)
 				if q.FormatValidator != nil {
@@ -91,8 +91,8 @@ func (s *Server) serveDocumentationRecursive(currentPath string, currentNode rou
 				buffer.WriteString(`</p>`)
 			}
 
-			buffer.WriteString(`<h3>Custom infos</h3>`)
-			buffer.WriteString(`<p>` + r.GetCustomDocumentation() + `</p>`)
+			buffer.WriteString(`<h3>Notes</h3>`)
+			buffer.WriteString(`<p>` + r.DocumentationNotes() + `</p>`)
 
 		}
 	}

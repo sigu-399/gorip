@@ -55,7 +55,7 @@ func (e *endpoint) FindMatchingResource(method string, contentTypeParser *conten
 		// Find a resource for given method
 		for _, v := range e.resources {
 
-			signature := v.GetSignature()
+			signature := v.Signature()
 
 			if signature.Method == method {
 			
