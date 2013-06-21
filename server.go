@@ -49,7 +49,10 @@ type Server struct {
 }
 
 func NewServer(pattern string, address string) *Server {
+
+	log.Printf("=== Create RIP Server\n")
 	return &Server{pattern: pattern, address: address, router: newRouter()}
+
 }
 
 func (s *Server) NewEndpoint(route string, resources ...Resource) error {
@@ -71,8 +74,18 @@ func (s *Server) NewEndpoint(route string, resources ...Resource) error {
 
 func (s *Server) ListenAndServe() error {
 
+	log.Printf("=== Listening on %s\n", s.address)
+
 	http.Handle(s.pattern, s)
 	return http.ListenAndServe(s.address, nil)
+}
+
+func (s *Server) PrintRouterTree() {
+
+	log.Printf("=== Router Tree ================= \n")
+	s.router.PrintRouterTree()
+	log.Printf("=== End of Router Tree ========== \n")
+
 }
 
 func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {

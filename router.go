@@ -39,8 +39,8 @@ const (
 )
 
 type router struct {
-	rootNode           routerNode
-	RouteVariableTypes map[string]RouteVariableType
+	rootNode           routerNode                   // rootNode is / : parent of all other nodes
+	RouteVariableTypes map[string]RouteVariableType // route variable types registered for this router
 }
 
 func newRouter() *router {
@@ -89,7 +89,6 @@ func (r *router) NewEndpoint(endp *endpoint) error {
 				}
 
 			} else { // Otherwise routerNodeInvariable
-
 				newChild = newRouterNodeInvariable(r, v)
 			}
 
@@ -181,10 +180,7 @@ func (r *router) FindNodeByRoute(routeString string) (routerNode, map[string]str
 // Displays the resulting router tree in the log
 
 func (r *router) PrintRouterTree() {
-
-	log.Printf("Router tree : \n")
 	r.printRouterTreeRecursive(r.rootNode, "", 0)
-
 }
 
 func (r *router) printRouterTreeRecursive(node routerNode, text string, level int) {
