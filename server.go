@@ -15,12 +15,12 @@
 // author           sigu-399
 // author-github    https://github.com/sigu-399
 // author-mail      sigu.399@gmail.com
-// 
+//
 // repository-name  gorip
 // repository-desc  REST Server Framework - ( gorip: REST In Peace ) - Go language
-// 
+//
 // description      Server implementation.
-// 
+//
 // created          03-03-2013
 
 package gorip
@@ -30,6 +30,7 @@ import (
 	"crypto/sha1"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -49,6 +50,21 @@ type Server struct {
 
 func NewServer(pattern string, address string) *Server {
 	return &Server{pattern: pattern, address: address, router: newRouter()}
+}
+
+func (s *Server) NewEndpoint(route string, resources ...Resource) error {
+
+	endp := &endpoint{route: route}
+
+	if len(resources) == 0 {
+		return errors.New("Endpoint must have at least one resource")
+	}
+
+	for _, res := range resources {
+		endp.AddResource(res)
+	}
+
+	return s.registerEndpoint(endp)
 }
 
 func (s *Server) ListenAndServe() error {
@@ -151,9 +167,9 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 								s.renderResourceResult(writer, &ResourceResult{HttpStatus: http.StatusBadRequest, Body: bytes.NewBufferString(message)}, `text/plain`, requestId)
 							} else {
 
-								// Found a matching resource implementation: 
+								// Found a matching resource implementation:
 
-								// Add expected content type to the context 
+								// Add expected content type to the context
 								resourceContext.ContentTypeIn = contentTypeIn
 								resourceContext.ContentTypeOut = contentTypeOut
 
@@ -209,7 +225,7 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 													break
 												} else {
 
-													// Validate query param													
+													// Validate query param
 													validator := qpObject.FormatValidator
 													if validator != nil {
 														if !validator.IsValid(qpValue) {
@@ -248,7 +264,7 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 
 }
 
-func (s *Server) RegisterEndpoint(e *endpoint) error {
+func (s *Server) registerEndpoint(e *endpoint) error {
 
 	if e == nil {
 		panic(`Endpoint cannot be nil`)
@@ -259,16 +275,16 @@ func (s *Server) RegisterEndpoint(e *endpoint) error {
 
 }
 
-func (s *Server) RegisterDocumentationEndpoint(url string) {
+func (s *Server) EnableDocumentationEndpoint(url string) {
 
-	log.Printf("Registering documentation : %s\n", url)
+	log.Printf("Enable documentation on endpoint %s\n", url)
 
 	s.documentationEndpointEnabled = true
 	s.documentationEndpointUrl = url
 
 }
 
-func (s *Server) RegisterRouteVariableType(kind string, rvtype RouteVariableType) error {
+func (s *Server) NewRouteVariableType(kind string, rvtype RouteVariableType) error {
 	return s.router.RegisterRouteVariableType(kind, rvtype)
 }
 
