@@ -42,7 +42,7 @@ func (s *Server) serveDocumentation(writer http.ResponseWriter) {
 	documentation.WriteString(`<html>` + "\n")
 
 	documentation.WriteString(`<head>` + "\n")
-	documentation.WriteString(`<title>gorip Server Auto-Documentation</title>` + "\n")
+	documentation.WriteString(`<title>REST Server Documentation - gorip</title>` + "\n")
 
 	documentation.WriteString(`<style type="text/css">` + "\n")
 
@@ -53,7 +53,7 @@ func (s *Server) serveDocumentation(writer http.ResponseWriter) {
 
 	documentation.WriteString(`<body>` + "\n")
 
-	documentation.WriteString(`<h1>Documentation</h1>` + "\n")
+	documentation.WriteString(`<h1>REST Documentation</h1>` + "\n")
 
 	s.serveDocumentationRecursive(currentPath, currentNode, documentation)
 

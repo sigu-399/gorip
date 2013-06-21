@@ -46,6 +46,9 @@ type Server struct {
 
 	documentationEndpointEnabled bool
 	documentationEndpointUrl     string
+
+	debugEnableRequestDump       bool
+	debugEnableRequestIdentifier bool
 }
 
 func NewServer(pattern string, address string) *Server {
@@ -72,6 +75,14 @@ func (s *Server) NewEndpoint(route string, resources ...Resource) error {
 	return s.router.NewEndpoint(endp)
 }
 
+func (s *Server) DebugEnableRequestDump(b bool) {
+	s.debugEnableRequestDump = b
+}
+
+func (s *Server) DebugEnableRequestIdentifier(b bool) {
+	s.debugEnableRequestIdentifier = b
+}
+
 func (s *Server) ListenAndServe() error {
 
 	log.Printf("=== Listening on %s\n", s.address)
@@ -80,7 +91,7 @@ func (s *Server) ListenAndServe() error {
 	return http.ListenAndServe(s.address, nil)
 }
 
-func (s *Server) PrintRouterTree() {
+func (s *Server) DebugPrintRouterTree() {
 
 	log.Printf("=== Router Tree ================= \n")
 	s.router.PrintRouterTree()
@@ -97,15 +108,23 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 
 	resourceContext := ResourceContext{}
 
-	// Generate request id
-	hasher := sha1.New()
-	hasher.Write([]byte(timeStart.String()))
-	requestId := base64.URLEncoding.EncodeToString(hasher.Sum(nil))
+	requestId := "o" // No request id
+
+	if s.debugEnableRequestIdentifier {
+		// Generate request id
+		hasher := sha1.New()
+		hasher.Write([]byte(timeStart.String()))
+		requestId = base64.URLEncoding.EncodeToString(hasher.Sum(nil))
+	}
 
 	log.Printf("[%s] Request %s %s", requestId, method, urlPath)
 
-	jsonRequest, _ := json.Marshal(request)
-	log.Printf("[%s] Request dump : %s", requestId, jsonRequest)
+	if s.debugEnableRequestDump {
+		jsonRequest, _ := json.MarshalIndent(request, "", "")
+		log.Printf("[%s] === Request dump =================", requestId)
+		fmt.Printf("%s\n", jsonRequest)
+		log.Printf("[%s] === End of Request dump ==========", requestId)
+	}
 
 	// Check if the documentation endpoint is enabled
 	if s.documentationEndpointEnabled && s.documentationEndpointUrl == urlPath {
