@@ -37,11 +37,28 @@ func (s *Server) serveDocumentation(writer http.ResponseWriter) {
 	documentation := new(bytes.Buffer)
 
 	currentNode := s.router.rootNode
-	currentPath := `(root)`
+	currentPath := ``
 
-	documentation.WriteString(`<h1>Documentation</h1>`)
+	documentation.WriteString(`<html>` + "\n")
+
+	documentation.WriteString(`<head>` + "\n")
+	documentation.WriteString(`<title>gorip Server Auto-Documentation</title>` + "\n")
+
+	documentation.WriteString(`<style type="text/css">` + "\n")
+
+	documentation.WriteString(`body{font-family: Tahoma, Geneva, sans-serif}` + "\n")
+	documentation.WriteString(`</style>` + "\n")
+
+	documentation.WriteString(`</head>` + "\n")
+
+	documentation.WriteString(`<body>` + "\n")
+
+	documentation.WriteString(`<h1>Documentation</h1>` + "\n")
 
 	s.serveDocumentationRecursive(currentPath, currentNode, documentation)
+
+	documentation.WriteString(`</body>` + "\n")
+	documentation.WriteString(`</html>` + "\n")
 
 	bodyOutLen := len(documentation.Bytes())
 
@@ -66,21 +83,17 @@ func (s *Server) serveDocumentationRecursive(currentPath string, currentNode rou
 	endpoint := currentNode.GetEndpoint()
 	if endpoint != nil {
 
-		buffer.WriteString(`<hr/>`)
-
-		buffer.WriteString(`<h2>` + path + `</h2>`)
+		buffer.WriteString(`<h2>` + path + `</h2>` + "\n")
 
 		resources := endpoint.GetResources()
 
 		for _, r := range resources {
 
-			buffer.WriteString(`<hr/>`)
-
 			signature := r.Signature()
 
-			buffer.WriteString(`<p>Method : ` + signature.Method + `</p>`)
-			buffer.WriteString(`<p>In : ` + strings.Join(signature.ContentTypeIn, `,`) + `</p>`)
-			buffer.WriteString(`<p>Out : ` + strings.Join(signature.ContentTypeOut, `,`) + `</p>`)
+			buffer.WriteString(`<p>Method : ` + signature.Method + `</p>` + "\n")
+			buffer.WriteString(`<p>Content Type In : ` + strings.Join(signature.ContentTypeIn, `,`) + `</p>` + "\n")
+			buffer.WriteString(`<p>Content Type Out : ` + strings.Join(signature.ContentTypeOut, `,`) + `</p>` + "\n")
 
 			qps := r.QueryParameters()
 			for key, q := range qps {
@@ -88,11 +101,11 @@ func (s *Server) serveDocumentationRecursive(currentPath string, currentNode rou
 				if q.FormatValidator != nil {
 					buffer.WriteString(` Validator : ` + q.FormatValidator.GetErrorMessage())
 				}
-				buffer.WriteString(`</p>`)
+				buffer.WriteString(`</p>` + "\n")
 			}
 
-			buffer.WriteString(`<h3>Notes</h3>`)
-			buffer.WriteString(`<p>` + r.DocumentationNotes() + `</p>`)
+			buffer.WriteString(`<h3>Notes</h3>` + "\n")
+			buffer.WriteString(`<p>` + r.DocumentationNotes() + `</p>` + "\n")
 
 		}
 	}
