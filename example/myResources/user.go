@@ -3,7 +3,7 @@ package myResources
 import (
 	"bytes"
 	"fmt"
-	rip "gorip"
+	rip "github.com/sigu-399/gorip"
 	"net/http"
 )
 

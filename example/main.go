@@ -4,7 +4,7 @@ package main
 // - A package containing our resources ( User, Post, whatever... )
 // - A package containing route variable types ( Id, RelationType, etc... )
 import (
-	rip "gorip"
+	rip "github.com/sigu-399/gorip"
 	"myResources"
 	"myRouteVariablesTypes"
 )
