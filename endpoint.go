@@ -54,9 +54,13 @@ func (e *endpoint) FindMatchingResource(method string, contentTypeParser *conten
 	for _, acceptElement := range acceptParser.contentTypes {
 		// Find a resource for given method
 		for _, v := range e.resources {
-			if v.GetMethod() == method {
-				allContentTypeOut := v.GetContentTypeOut()
-				allContentTypeIn := v.GetContentTypeIn()
+
+			signature := v.GetSignature()
+
+			if signature.Method == method {
+			
+				allContentTypeIn := signature.ContentTypeIn
+				allContentTypeOut := signature.ContentTypeOut
 
 				// If OUT content type matches or 'matching everything' */* then the resource matches
 				for _, contentTypeOut := range allContentTypeOut {

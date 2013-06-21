@@ -15,12 +15,12 @@
 // author           sigu-399
 // author-github    https://github.com/sigu-399
 // author-mail      sigu.399@gmail.com
-// 
+//
 // repository-name  gorip
 // repository-desc  REST Server Framework - ( gorip: REST In Peace ) - Go language
-// 
+//
 // description      Generates the server endpoints documentation.
-// 
+//
 // created          19-03-2013
 
 package gorip
@@ -76,9 +76,11 @@ func (s *Server) serveDocumentationRecursive(currentPath string, currentNode rou
 
 			buffer.WriteString(`<hr/>`)
 
-			buffer.WriteString(`<p>Method : ` + r.GetMethod() + `</p>`)
-			buffer.WriteString(`<p>In : ` + strings.Join(r.GetContentTypeIn(), `,`) + `</p>`)
-			buffer.WriteString(`<p>Out : ` + strings.Join(r.GetContentTypeOut(), `,`) + `</p>`)
+			signature := r.GetSignature()
+
+			buffer.WriteString(`<p>Method : ` + signature.Method + `</p>`)
+			buffer.WriteString(`<p>In : ` + strings.Join(signature.ContentTypeIn, `,`) + `</p>`)
+			buffer.WriteString(`<p>Out : ` + strings.Join(signature.ContentTypeOut, `,`) + `</p>`)
 
 			qps := r.GetQueryParameters()
 			for key, q := range qps {
