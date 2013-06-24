@@ -5,8 +5,8 @@ package main
 // - A package containing route variable types ( Id, RelationType, etc... )
 import (
 	rip "github.com/sigu-399/gorip"
-	"myResources"
-	"myRouteVariablesTypes"
+	"myResourceHandlers"
+	"myRouteVariableTypes"
 )
 
 func main() {
@@ -20,9 +20,9 @@ func main() {
 	// Registers our id type, you are free to create any type you need/want	but this type is the most common and used one.
 	// See endpoint creation for details in the next block of code.
 	//
-	// ( The route variable is defined in myRouteVariablesTypes/idType.go )
+	// ( The route variable is defined in myRouteVariableTypes/idType.go )
 	//
-	err = myServer.NewRouteVariableType("id", &myRouteVariablesTypes.IdType{})
+	err = myServer.NewRouteVariableType("id", &myRouteVariableTypes.IdType{})
 	if err != nil {
 		panic(err.Error())
 	}
@@ -40,7 +40,7 @@ func main() {
 	//
 	// ( The Resource is defined in myResources/user.go )
 	//
-	err = myServer.NewEndpoint("/users/{user_id:id}", &myResources.GetUser{})
+	err = myServer.NewEndpoint("/users/{user_id:id}", &myResourceHandlers.GetUser{})
 	if err != nil {
 		panic(err.Error())
 	}
