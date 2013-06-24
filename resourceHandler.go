@@ -29,7 +29,7 @@ import (
 	"bytes"
 )
 
-type Resource interface {
+type ResourceHandler interface {
 	Factory() Resource
 	Execute(context *ResourceContext) ResourceResult
 	Signature() *ResourceSignature
@@ -37,7 +37,13 @@ type Resource interface {
 	DocumentationNotes() string
 }
 
-type ResourceContext struct {
+type ResourceHandlerSignature struct {
+	Method         string
+	ContentTypeIn  []string
+	ContentTypeOut []string
+}
+
+type ResourceHandlerContext struct {
 	RouteVariables  map[string]string
 	QueryParameters map[string]string
 	ContentTypeIn   *string
@@ -45,13 +51,7 @@ type ResourceContext struct {
 	Body            *bytes.Buffer
 }
 
-type ResourceResult struct {
+type ResourceHandlerResult struct {
 	HttpStatus int
 	Body       *bytes.Buffer
-}
-
-type ResourceSignature struct {
-	Method         string
-	ContentTypeIn  []string
-	ContentTypeOut []string
 }

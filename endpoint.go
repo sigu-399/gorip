@@ -30,7 +30,7 @@ import ()
 
 type endpoint struct {
 	route     string
-	resources []Resource
+	resourceHandlers []ResourceHandler
 }
 
 func (e *endpoint) GetRoute() string {
