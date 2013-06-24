@@ -20,7 +20,7 @@
 // repository-desc  REST Server Framework - ( gorip: REST In Peace ) - Go language
 //
 // description      Defines a REST endpoint.
-//                  An endpoint is a url route and associated resources.
+//                  An endpoint is a url route and associated resourceHandlers.
 //
 // created          07-03-2013
 
@@ -29,7 +29,7 @@ package gorip
 import ()
 
 type endpoint struct {
-	route     string
+	route            string
 	resourceHandlers []ResourceHandler
 }
 
@@ -37,15 +37,15 @@ func (e *endpoint) GetRoute() string {
 	return e.route
 }
 
-func (e *endpoint) AddResource(resource Resource) {
-	e.resources = append(e.resources, resource)
+func (e *endpoint) AddResource(rh ResourceHandler) {
+	e.resourceHandlers = append(e.resourceHandlers, rh)
 }
 
-func (e *endpoint) GetResources() []Resource {
-	return e.resources
+func (e *endpoint) GetResourceHandlers() []ResourceHandler {
+	return e.resourceHandlers
 }
 
-func (e *endpoint) FindMatchingResource(method string, contentTypeParser *contentTypeHeaderParser, acceptParser *acceptHeaderParser) (Resource, *string, *string) {
+func (e *endpoint) FindMatchingResource(method string, contentTypeParser *contentTypeHeaderParser, acceptParser *acceptHeaderParser) (ResourceHandler, *string, *string) {
 
 	var resultContentTypeIn *string
 	var resultContentTypeOut *string
@@ -53,12 +53,12 @@ func (e *endpoint) FindMatchingResource(method string, contentTypeParser *conten
 	// Loop through accepted OUT content types, highest priority first
 	for _, acceptElement := range acceptParser.contentTypes {
 		// Find a resource for given method
-		for _, v := range e.resources {
+		for _, v := range e.resourceHandlers {
 
 			signature := v.Signature()
 
 			if signature.Method == method {
-			
+
 				allContentTypeIn := signature.ContentTypeIn
 				allContentTypeOut := signature.ContentTypeOut
 

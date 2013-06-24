@@ -85,9 +85,9 @@ func (s *Server) serveDocumentationRecursive(currentPath string, currentNode rou
 
 		buffer.WriteString(`<h2>` + path + `</h2>` + "\n")
 
-		resources := endpoint.GetResources()
+		resourceHandlers := endpoint.GetResourceHandlers()
 
-		for _, r := range resources {
+		for _, r := range resourceHandlers {
 
 			signature := r.Signature()
 

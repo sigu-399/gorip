@@ -30,9 +30,9 @@ import (
 )
 
 type ResourceHandler interface {
-	Factory() Resource
-	Execute(context *ResourceContext) ResourceResult
-	Signature() *ResourceSignature
+	Factory() ResourceHandler
+	Execute(context *ResourceHandlerContext) ResourceHandlerResult
+	Signature() *ResourceHandlerSignature
 	QueryParameters() map[string]QueryParameter
 	DocumentationNotes() string
 }
