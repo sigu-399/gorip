@@ -251,7 +251,7 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	resourceHandlerContext.Body = bytes.NewBuffer(bodyInBytes)
 
 	// Create a new instance from factory and executes it
-	resource := matchingResource.Factory()
+	resource := matchingResource
 	if resource == nil {
 		message := fmt.Sprintf("[%s] Resource factory must instanciate a valid Resource", requestId)
 		log.Printf(message)
@@ -264,7 +264,7 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	resourceHandlerContext.QueryParameters = make(map[string]string)
 	urlValues := request.URL.Query()
 
-	for qpKey, qpObject := range resource.QueryParameters() {
+	for qpKey, qpObject := range resource.QueryParameters {
 		qpValue := urlValues.Get(qpKey)
 		if qpValue == `` {
 			qpValue = qpObject.DefaultValue
@@ -298,7 +298,7 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	}
 
 	// Everything went fine, finally we can serve the request
-	result := resource.Execute(&resourceHandlerContext)
+	result := resource.Implementation.Execute(&resourceHandlerContext)
 	s.renderResourceResult(writer, &result, *resourceHandlerContext.ContentTypeOut, requestId)
 
 }

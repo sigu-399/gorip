@@ -4,10 +4,39 @@ package main
 // - A package containing our resources ( User, Post, whatever... )
 // - A package containing route variable types ( Id, RelationType, etc... )
 import (
+	"bytes"
+	"fmt"
 	rip "gorip"
-	"myResourceHandlers"
-	"myRouteVariableTypes"
+	"net/http"
 )
+import (
+	"strconv"
+)
+
+type GetUser struct {
+}
+
+func (_ GetUser) Execute(context *rip.ResourceHandlerContext) rip.ResourceHandlerResult {
+	displayText := fmt.Sprintf(`Hello %s, your id is %s !`, context.QueryParameters["who"], context.RouteVariables["user_id"])
+	return rip.ResourceHandlerResult{HttpStatus: http.StatusOK, Body: bytes.NewBufferString(displayText)}
+}
+
+// "id" is a route variable
+// Its definition is simple : it must be an integer > 0
+
+type RouteVariableIdType struct {
+}
+
+// IdType defintion should match the gorip.RouteVariableType interface
+// Simple though, it is only a function definition:
+//
+func (_ RouteVariableIdType) Matches(value string) bool {
+	id, err := strconv.Atoi(value)
+	if err != nil {
+		return false
+	}
+	return id > 0
+}
 
 func main() {
 
@@ -22,7 +51,7 @@ func main() {
 	//
 	// ( The route variable is defined in myRouteVariableTypes/idType.go )
 	//
-	err = myServer.NewRouteVariableType("id", &myRouteVariableTypes.IdType{})
+	err = myServer.NewRouteVariableType("id", RouteVariableIdType{})
 	if err != nil {
 		panic(err.Error())
 	}
@@ -40,7 +69,14 @@ func main() {
 	//
 	// ( The Resource is defined in myResources/user.go )
 	//
-	err = myServer.NewEndpoint("/users/{user_id:id}", &myResourceHandlers.GetUser{})
+	err = myServer.NewEndpoint("/users/{user_id:id}", rip.ResourceHandler{Method: rip.HttpMethodGET,
+		ContentTypeIn:  []string{},
+		ContentTypeOut: []string{`text/plain`},
+		QueryParameters: map[string]rip.QueryParameter{
+			"who": rip.QueryParameter{Kind: rip.QueryParameterString, DefaultValue: "World"},
+			"age": rip.QueryParameter{Kind: rip.QueryParameterInt, DefaultValue: "18"}},
+		Implementation: GetUser{}})
+
 	if err != nil {
 		panic(err.Error())
 	}
@@ -50,17 +86,17 @@ func main() {
 	myServer.EnableDocumentationEndpoint("/documentation")
 
 	//The following functions can be usefull during development/debugging/tracking :
-	
+
 	// Displays an ascii representation of the router tree
 	myServer.DebugPrintRouterTree()
 
-	// Print a request dump to the console ( JSON format ) - on/off 
+	// Print a request dump to the console ( JSON format ) - on/off
 	myServer.DebugEnableLogRequestDump(true)
 
-	// Uses a unique identifier for every request log line - good for tracking - on/off 
+	// Uses a unique identifier for every request log line - good for tracking - on/off
 	myServer.DebugEnableLogRequestIdentifier(true)
 
-	// Outputs the duration from the request to the response - on/off 
+	// Outputs the duration from the request to the response - on/off
 	myServer.DebugEnableLogRequestDuration(true)
 
 	// Finally starts the server

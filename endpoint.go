@@ -45,7 +45,7 @@ func (e *endpoint) GetResourceHandlers() []ResourceHandler {
 	return e.resourceHandlers
 }
 
-func (e *endpoint) FindMatchingResource(method string, contentTypeParser *contentTypeHeaderParser, acceptParser *acceptHeaderParser) (ResourceHandler, *string, *string) {
+func (e *endpoint) FindMatchingResource(method string, contentTypeParser *contentTypeHeaderParser, acceptParser *acceptHeaderParser) (*ResourceHandler, *string, *string) {
 
 	var resultContentTypeIn *string
 	var resultContentTypeOut *string
@@ -55,12 +55,10 @@ func (e *endpoint) FindMatchingResource(method string, contentTypeParser *conten
 		// Find a resource for given method
 		for _, v := range e.resourceHandlers {
 
-			signature := v.Signature()
+			if v.Method == method {
 
-			if signature.Method == method {
-
-				allContentTypeIn := signature.ContentTypeIn
-				allContentTypeOut := signature.ContentTypeOut
+				allContentTypeIn := v.ContentTypeIn
+				allContentTypeOut := v.ContentTypeOut
 
 				// If OUT content type matches or 'matching everything' */* then the resource matches
 				for _, contentTypeOut := range allContentTypeOut {
@@ -87,7 +85,7 @@ func (e *endpoint) FindMatchingResource(method string, contentTypeParser *conten
 							}
 						}
 						if matchesIn {
-							return v, resultContentTypeIn, resultContentTypeOut
+							return &v, resultContentTypeIn, resultContentTypeOut
 						}
 					}
 				}

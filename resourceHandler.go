@@ -29,18 +29,17 @@ import (
 	"bytes"
 )
 
-type ResourceHandler interface {
-	Factory() ResourceHandler
+type ResourceHandlerImplementation interface {
 	Execute(context *ResourceHandlerContext) ResourceHandlerResult
-	Signature() *ResourceHandlerSignature
-	QueryParameters() map[string]QueryParameter
-	DocumentationNotes() string
 }
 
-type ResourceHandlerSignature struct {
-	Method         string
-	ContentTypeIn  []string
-	ContentTypeOut []string
+type ResourceHandler struct {
+	Method             string
+	ContentTypeIn      []string
+	ContentTypeOut     []string
+	QueryParameters    map[string]QueryParameter
+	DocumentationNotes string
+	Implementation     ResourceHandlerImplementation
 }
 
 type ResourceHandlerContext struct {
