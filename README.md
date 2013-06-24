@@ -6,9 +6,16 @@ REST Server Framework written in Go language
 
 ## Status
 
-Completed & Tested : v 1.0.1
+Completed & Tested : v 1.0.2
 
 ## History
+
+ v 1.0.2
+
+```
+Even more improvements on the public interface, making it more user friendly and allow improved productivity
+Struct names refactoring
+```
 
  v 1.0.1 
 
@@ -25,4 +32,5 @@ Initial version
 
 ## How to use
 
-A full example is provided in the example folder ( https://github.com/sigu-399/gorip/tree/master/example )
+A documented example is provided in the example folder ( https://github.com/sigu-399/gorip/tree/master/example/src/main.go )
+
