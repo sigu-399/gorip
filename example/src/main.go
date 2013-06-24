@@ -3,7 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
-	rip "gorip"
+	"github.com/sigu-399/gorip"
 	"net/http"
 )
 import (
@@ -24,29 +24,29 @@ func (_ RouteVariableIdType) Matches(value string) bool {
 type GetUserResourceHandlerImpl struct {
 }
 
-func (_ GetUserResourceHandlerImpl) Execute(context *rip.ResourceHandlerContext) rip.ResourceHandlerResult {
+func (_ GetUserResourceHandlerImpl) Execute(context *gorip.ResourceHandlerContext) gorip.ResourceHandlerResult {
 	displayText := fmt.Sprintf(`Hello %s, your id is %s !`, context.QueryParameters["who"], context.RouteVariables["user_id"])
-	return rip.ResourceHandlerResult{HttpStatus: http.StatusOK, Body: bytes.NewBufferString(displayText)}
+	return gorip.ResourceHandlerResult{HttpStatus: http.StatusOK, Body: bytes.NewBufferString(displayText)}
 }
 
 func main() {
 
 	var err error
 
-	myServer := rip.NewServer("/", ":8080")
+	myServer := gorip.NewServer("/", ":8080")
 
 	err = myServer.NewRouteVariableType("id", RouteVariableIdType{})
 	if err != nil {
 		panic(err.Error())
 	}
 
-	err = myServer.NewEndpoint("/users/{user_id:id}", rip.ResourceHandler{
-		Method:         rip.HttpMethodGET,
+	err = myServer.NewEndpoint("/users/{user_id:id}", gorip.ResourceHandler{
+		Method:         gorip.HttpMethodGET,
 		ContentTypeIn:  []string{},
 		ContentTypeOut: []string{`text/plain`},
-		QueryParameters: map[string]rip.QueryParameter{
-			"who": rip.QueryParameter{Kind: rip.QueryParameterString, DefaultValue: "World"},
-			"age": rip.QueryParameter{Kind: rip.QueryParameterInt, DefaultValue: "18"}},
+		QueryParameters: map[string]gorip.QueryParameter{
+			"who": gorip.QueryParameter{Kind: gorip.QueryParameterString, DefaultValue: "World"},
+			"age": gorip.QueryParameter{Kind: gorip.QueryParameterInt, DefaultValue: "18"}},
 		Implementation: GetUserResourceHandlerImpl{}})
 
 	if err != nil {
