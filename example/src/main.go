@@ -3,7 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"gorip"
+	"github.com/sigu-399/gorip"
 	"net/http"
 	"strconv"
 )
