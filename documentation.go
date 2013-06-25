@@ -45,8 +45,14 @@ func (s *Server) serveDocumentation(writer http.ResponseWriter) {
 	documentation.WriteString(`<title>REST Server Documentation - gorip</title>` + "\n")
 
 	documentation.WriteString(`<style type="text/css">` + "\n")
+	documentation.WriteString(`body {margin: 0;font-family: Helvetica, Arial, sans-serif;font-size: 16px;color: #222}` + "\n")
+	documentation.WriteString(`h1, h2, h3 {color:#37AB5E;margin:20px;padding:0}` + "\n")
+	documentation.WriteString(`h1 {font-size: 24px; font-weight: bold}` + "\n")
+	documentation.WriteString(`h2 {font-size: 20px;background: #E0F5EB;padding: 2px 5px}` + "\n")
+	documentation.WriteString(`h3 {font-size: 18px}` + "\n")
+	documentation.WriteString(`h4 {font-size: 16px}` + "\n")
+	documentation.WriteString(`p{margin: 20px}` + "\n")
 
-	documentation.WriteString(`body{font-family: Tahoma, Geneva, sans-serif}` + "\n")
 	documentation.WriteString(`</style>` + "\n")
 
 	documentation.WriteString(`</head>` + "\n")
@@ -89,7 +95,7 @@ func (s *Server) serveDocumentationRecursive(currentPath string, currentNode rou
 
 		for _, r := range resourceHandlers {
 
-			buffer.WriteString(`<p>Method : ` + r.Method + `</p>` + "\n")
+			buffer.WriteString(`<h3>` + r.Method + `</h3>` + "\n")
 			buffer.WriteString(`<p>Content Type In : ` + strings.Join(r.ContentTypeIn, `,`) + `</p>` + "\n")
 			buffer.WriteString(`<p>Content Type Out : ` + strings.Join(r.ContentTypeOut, `,`) + `</p>` + "\n")
 
@@ -102,9 +108,10 @@ func (s *Server) serveDocumentationRecursive(currentPath string, currentNode rou
 				buffer.WriteString(`</p>` + "\n")
 			}
 
-			buffer.WriteString(`<h3>Notes</h3>` + "\n")
-			buffer.WriteString(`<p>` + r.DocumentationNotes + `</p>` + "\n")
-
+			if len(r.DocumentationNotes) > 0 {
+				buffer.WriteString(`<h4>Notes</h4>` + "\n")
+				buffer.WriteString(`<p>` + r.DocumentationNotes + `</p>` + "\n")
+			}
 		}
 	}
 
