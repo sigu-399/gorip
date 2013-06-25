@@ -12,7 +12,7 @@ import (
 //
 // "{user_id:id}" is called a route variable, it is composed of a name(user_id) and a type(id).
 //
-// We will first defined the type "id" to be recognized by the server.
+// We will first define the type "id" to be recognized by the server.
 // It is expected that the "id" is an integer > 0
 //
 // RouteVariableIdType fits the interface gorip.RouteVariableType ( defined in router.go )
@@ -21,7 +21,7 @@ import (
 //   Matches(string) bool
 // }
 //
-// You may, of course, need to add your own types to fit your needs.
+// You may, of course, to add your own types to fit your needs.
 //
 type RouteVariableIdType struct {
 }
@@ -85,21 +85,34 @@ func main() {
 		QueryParameters: map[string]gorip.QueryParameter{ // Query parameters from the URL
 			"foo": gorip.QueryParameter{Kind: gorip.QueryParameterString, DefaultValue: "George"},
 			"bar": gorip.QueryParameter{Kind: gorip.QueryParameterInt, DefaultValue: "1984"}},
-		Implementation: GetUserResourceHandlerImpl{}, // Implementation of this method
+		Implementation: GetUserResourceHandlerImpl{}, // Implementation of this handler
 		Documentation: &gorip.ResourceHandlerDocumentation{ // Documentation and live test
 			TestURL:         "http://localhost:8080/users/1",
 			TestContentType: "text/plain",
 			AdditionalNotes: "This is a user..."}})
 	onError(err)
 
-	// rip auto generates documentation if you want to
+	// Note: NewEndpoint is a variadic function, allowing multiple handlers to be added
+	// For example: myServer.NewEndpoint(	"/users/{user_id:id}",
+	// 										gorip.ResourceHandler{...},
+	// 										gorip.ResourceHandler{...},
+	// 										gorip.ResourceHandler{...} etc... )
+	// Letting you bind a GET, POST and DELETE request to the same endpoint for example.
+
+	// Miscellaneous:
+	//
+	// can auto generate documentation if you want to
 	myServer.EnableDocumentationEndpoint("/documentation")
+
 	// Logs an ascii representation of the routing tree
 	myServer.DebugPrintRouterTree()
+
 	// Dumps the request in json format to the console
 	myServer.DebugEnableLogRequestDump(true)
+
 	// Every log line will be annotated with a unique identifier to track a specific request all the way down
 	myServer.DebugEnableLogRequestIdentifier(true)
+
 	// Displays the duration of the request/response
 	myServer.DebugEnableLogRequestDuration(true)
 
