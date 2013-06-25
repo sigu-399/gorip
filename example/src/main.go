@@ -3,7 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"github.com/sigu-399/gorip"
+	"gorip"
 	"net/http"
 	"strconv"
 )
@@ -79,7 +79,7 @@ func main() {
 
 	// Registers our endpoint
 	err = myServer.NewEndpoint("/users/{user_id:id}", gorip.ResourceHandler{
-		Method:         gorip.HttpMethodGET,    // GET method
+		Method:         "GET",                  // GET method
 		ContentTypeIn:  []string{},             // No content in
 		ContentTypeOut: []string{`text/plain`}, // Content out is plain text in this example, could be json or xml...
 		QueryParameters: map[string]gorip.QueryParameter{ // Query parameters from the URL
