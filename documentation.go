@@ -51,7 +51,8 @@ func (s *Server) serveDocumentation(writer http.ResponseWriter) {
 	documentation.WriteString(`h2 {font-size: 20px;background: #E0F5EB;padding: 2px 5px}` + "\n")
 	documentation.WriteString(`h3 {font-size: 18px}` + "\n")
 	documentation.WriteString(`h4 {font-size: 16px}` + "\n")
-	documentation.WriteString(`p{margin: 20px}` + "\n")
+	documentation.WriteString(`p, table{margin: 20px}` + "\n")
+	documentation.WriteString(`td {background-color:#F0F5EB}` + "\n")
 
 	documentation.WriteString(`</style>` + "\n")
 
@@ -96,17 +97,23 @@ func (s *Server) serveDocumentationRecursive(currentPath string, currentNode rou
 		for _, r := range resourceHandlers {
 
 			buffer.WriteString(`<h3>` + r.Method + `</h3>` + "\n")
-			buffer.WriteString(`<p>Content Type In : ` + strings.Join(r.ContentTypeIn, `,`) + `</p>` + "\n")
-			buffer.WriteString(`<p>Content Type Out : ` + strings.Join(r.ContentTypeOut, `,`) + `</p>` + "\n")
 
+			buffer.WriteString(`<table>` + "\n")
+			buffer.WriteString(`<tr><th></th><th>Content Type</th></tr>` + "\n")
+			buffer.WriteString(`<tr><td>In</td><td>` + strings.Join(r.ContentTypeIn, `,`) + `</td>` + "\n")
+			buffer.WriteString(`<tr><td>Out</td><td>` + strings.Join(r.ContentTypeOut, `,`) + `</td>` + "\n")
+			buffer.WriteString(`</table>` + "\n")
+
+			buffer.WriteString(`<table>` + "\n")
+			buffer.WriteString(`<tr><th>Query Param</th><th>Kind</th><th>Default</th></tr>` + "\n")
 			qps := r.QueryParameters
 			for key, q := range qps {
-				buffer.WriteString(`<p>QueryParam : ` + key + ` [type ` + q.Kind + `][default ` + q.DefaultValue + `]`)
+				buffer.WriteString(`<tr><td>` + key + `</td><td>` + q.Kind + `</td><td>` + q.DefaultValue + `</td><tr>`)
 				if q.FormatValidator != nil {
 					buffer.WriteString(` Validator : ` + q.FormatValidator.GetErrorMessage())
 				}
-				buffer.WriteString(`</p>` + "\n")
 			}
+			buffer.WriteString(`</table>` + "\n")
 
 			if len(r.DocumentationNotes) > 0 {
 				buffer.WriteString(`<h4>Notes</h4>` + "\n")
