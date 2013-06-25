@@ -88,7 +88,8 @@ func main() {
 		Implementation: GetUserResourceHandlerImpl{}, // Implementation of this method
 		Documentation: &gorip.ResourceHandlerDocumentation{ // Documentation and live test
 			TestURL:         "http://localhost:8080/users/1",
-			TestContentType: "text/plain"}})
+			TestContentType: "text/plain",
+			AdditionalNotes: "This is a user..."}})
 	onError(err)
 
 	// rip auto generates documentation if you want to
