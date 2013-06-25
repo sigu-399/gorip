@@ -85,7 +85,10 @@ func main() {
 		QueryParameters: map[string]gorip.QueryParameter{ // Query parameters from the URL
 			"foo": gorip.QueryParameter{Kind: gorip.QueryParameterString, DefaultValue: "George"},
 			"bar": gorip.QueryParameter{Kind: gorip.QueryParameterInt, DefaultValue: "1984"}},
-		Implementation: GetUserResourceHandlerImpl{}}) // Implementation of this method
+		Implementation: GetUserResourceHandlerImpl{}, // Implementation of this method
+		Documentation: &gorip.ResourceHandlerDocumentation{ // Documentation and live test
+			TestURL:         "http://localhost:8080/users/1",
+			TestContentType: "text/plain"}})
 	onError(err)
 
 	// rip auto generates documentation if you want to

@@ -34,12 +34,12 @@ type ResourceHandlerImplementation interface {
 }
 
 type ResourceHandler struct {
-	Method             string
-	ContentTypeIn      []string
-	ContentTypeOut     []string
-	QueryParameters    map[string]QueryParameter
-	DocumentationNotes string
-	Implementation     ResourceHandlerImplementation
+	Method          string
+	ContentTypeIn   []string
+	ContentTypeOut  []string
+	QueryParameters map[string]QueryParameter
+	Implementation  ResourceHandlerImplementation
+	Documentation   *ResourceHandlerDocumentation
 }
 
 type ResourceHandlerContext struct {
@@ -53,4 +53,10 @@ type ResourceHandlerContext struct {
 type ResourceHandlerResult struct {
 	HttpStatus int
 	Body       *bytes.Buffer
+}
+
+type ResourceHandlerDocumentation struct {
+	TestURL         string
+	TestContentType string
+	AdditionalNotes string
 }

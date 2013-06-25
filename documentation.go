@@ -27,6 +27,8 @@ package gorip
 
 import (
 	"bytes"
+	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
@@ -46,12 +48,13 @@ func (s *Server) serveDocumentation(writer http.ResponseWriter) {
 
 	documentation.WriteString(`<style type="text/css">` + "\n")
 	documentation.WriteString(`body {margin: 0;font-family: Helvetica, Arial, sans-serif;font-size: 16px;color: #222}` + "\n")
-	documentation.WriteString(`h1, h2, h3 {color:#37AB5E;margin:20px;padding:0}` + "\n")
+	documentation.WriteString(`h1, h2, h3, h4 {color:#37AB5E;margin:20px;padding:0}` + "\n")
 	documentation.WriteString(`h1 {font-size: 24px; font-weight: bold}` + "\n")
 	documentation.WriteString(`h2 {font-size: 20px;background: #E0F5EB;padding: 2px 5px}` + "\n")
 	documentation.WriteString(`h3 {font-size: 18px}` + "\n")
 	documentation.WriteString(`h4 {font-size: 16px}` + "\n")
-	documentation.WriteString(`p, table{margin: 20px}` + "\n")
+	documentation.WriteString(`p, pre, table{margin: 20px}` + "\n")
+	documentation.WriteString(`pre {background: none repeat scroll 0 0 #E9E9E9;border-radius: 5px 5px 5px 5px;padding: 10px;}` + "\n")
 	documentation.WriteString(`td {background-color:#F0F5EB}` + "\n")
 
 	documentation.WriteString(`</style>` + "\n")
@@ -115,9 +118,37 @@ func (s *Server) serveDocumentationRecursive(currentPath string, currentNode rou
 			}
 			buffer.WriteString(`</table>` + "\n")
 
-			if len(r.DocumentationNotes) > 0 {
-				buffer.WriteString(`<h4>Notes</h4>` + "\n")
-				buffer.WriteString(`<p>` + r.DocumentationNotes + `</p>` + "\n")
+			if r.Documentation != nil {
+
+				rhd := r.Documentation
+
+				if len(rhd.TestURL) > 0 {
+
+					testResultString := ""
+
+					client := &http.Client{}
+					req, _ := http.NewRequest(r.Method, rhd.TestURL, nil)
+					req.Header.Add(`Accept`, rhd.TestContentType)
+					resp, err := client.Do(req)
+					if err != nil {
+						testResultString = "ERROR : " + err.Error()
+					} else {
+						bodyInBytes, err := ioutil.ReadAll(resp.Body)
+						if err != nil {
+							testResultString = "ERROR : " + err.Error()
+						} else {
+							testResultString = string(bodyInBytes)
+						}
+					}
+
+					buffer.WriteString(fmt.Sprintf(`<h4>Example (%s)</h4>`+"\n", rhd.TestURL))
+					buffer.WriteString(`<pre>` + testResultString + `</pre>` + "\n")
+				}
+
+				if len(rhd.AdditionalNotes) > 0 {
+					buffer.WriteString(`<h4>Additional Notes</h4>` + "\n")
+					buffer.WriteString(`<p>` + rhd.AdditionalNotes + `</p>` + "\n")
+				}
 			}
 		}
 	}
