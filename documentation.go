@@ -56,6 +56,7 @@ func (s *Server) serveDocumentation(writer http.ResponseWriter) {
 	documentation.WriteString(`p, pre, table{margin: 20px}` + "\n")
 	documentation.WriteString(`pre {background: none repeat scroll 0 0 #E9E9E9;border-radius: 5px 5px 5px 5px;padding: 10px;}` + "\n")
 	documentation.WriteString(`td {background-color:#F0F5EB}` + "\n")
+	documentation.WriteString(`th {font-size:small; font-weight:normal}` + "\n")
 	documentation.WriteString(`.left {float:left; width:50%}` + "\n")
 	documentation.WriteString(`.right {float:right; width:50%}` + "\n")
 
@@ -104,14 +105,15 @@ func (s *Server) serveDocumentationRecursive(currentPath string, currentNode rou
 			buffer.WriteString(`<h3>` + r.Method + `</h3>` + "\n")
 
 			buffer.WriteString(`<div class="left">` + "\n")
+			buffer.WriteString(`<h4>Content Type</h4>` + "\n")
 			buffer.WriteString(`<table>` + "\n")
-			buffer.WriteString(`<tr><th></th><th>Content Type</th></tr>` + "\n")
 			buffer.WriteString(`<tr><td>In</td><td>` + strings.Join(r.ContentTypeIn, `,`) + `</td>` + "\n")
 			buffer.WriteString(`<tr><td>Out</td><td>` + strings.Join(r.ContentTypeOut, `,`) + `</td>` + "\n")
 			buffer.WriteString(`</table>` + "\n")
 
+			buffer.WriteString(`<h4>Query Parameters</h4>` + "\n")
 			buffer.WriteString(`<table>` + "\n")
-			buffer.WriteString(`<tr><th>Query Param</th><th>Kind</th><th>Default</th></tr>` + "\n")
+			buffer.WriteString(`<tr><th>Name</th><th>Kind</th><th>Default</th></tr>` + "\n")
 			qps := r.QueryParameters
 			for key, q := range qps {
 				buffer.WriteString(`<tr><td>` + key + `</td><td>` + q.Kind + `</td><td>` + q.DefaultValue + `</td><tr>`)
