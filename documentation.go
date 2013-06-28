@@ -56,6 +56,8 @@ func (s *Server) serveDocumentation(writer http.ResponseWriter) {
 	documentation.WriteString(`p, pre, table{margin: 20px}` + "\n")
 	documentation.WriteString(`pre {background: none repeat scroll 0 0 #E9E9E9;border-radius: 5px 5px 5px 5px;padding: 10px;}` + "\n")
 	documentation.WriteString(`td {background-color:#F0F5EB}` + "\n")
+	documentation.WriteString(`.left {float:left; width:50%}` + "\n")
+	documentation.WriteString(`.right {float:right; width:50%}` + "\n")
 
 	documentation.WriteString(`</style>` + "\n")
 
@@ -101,6 +103,7 @@ func (s *Server) serveDocumentationRecursive(currentPath string, currentNode rou
 
 			buffer.WriteString(`<h3>` + r.Method + `</h3>` + "\n")
 
+			buffer.WriteString(`<div class="left">` + "\n")
 			buffer.WriteString(`<table>` + "\n")
 			buffer.WriteString(`<tr><th></th><th>Content Type</th></tr>` + "\n")
 			buffer.WriteString(`<tr><td>In</td><td>` + strings.Join(r.ContentTypeIn, `,`) + `</td>` + "\n")
@@ -117,6 +120,9 @@ func (s *Server) serveDocumentationRecursive(currentPath string, currentNode rou
 				}
 			}
 			buffer.WriteString(`</table>` + "\n")
+			buffer.WriteString(`</div>` + "\n")
+
+			buffer.WriteString(`<div class="right">` + "\n")
 
 			if r.Documentation != nil {
 
@@ -141,7 +147,9 @@ func (s *Server) serveDocumentationRecursive(currentPath string, currentNode rou
 						}
 					}
 
-					buffer.WriteString(fmt.Sprintf(`<h4>Example (%s)</h4>`+"\n", rhd.TestURL))
+					buffer.WriteString(`<h4>Example</h4>` + "\n")
+					buffer.WriteString(fmt.Sprintf(`<p>%s</p>`+"\n", rhd.TestURL))
+
 					buffer.WriteString(`<pre>` + testResultString + `</pre>` + "\n")
 				}
 
@@ -150,6 +158,10 @@ func (s *Server) serveDocumentationRecursive(currentPath string, currentNode rou
 					buffer.WriteString(`<p>` + rhd.AdditionalNotes + `</p>` + "\n")
 				}
 			}
+
+			buffer.WriteString(`</div>` + "\n")
+			buffer.WriteString(`<div style = "clear:both"></div>` + "\n")
+
 		}
 	}
 
