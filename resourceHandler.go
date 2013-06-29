@@ -27,6 +27,7 @@ package gorip
 
 import (
 	"bytes"
+	"net/http"
 )
 
 type ResourceHandlerImplementation interface {
@@ -48,6 +49,7 @@ type ResourceHandlerContext struct {
 	ContentTypeIn   *string
 	ContentTypeOut  *string
 	Body            *bytes.Buffer
+	Header          http.Header
 }
 
 type ResourceHandlerResult struct {

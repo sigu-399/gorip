@@ -168,10 +168,11 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	// Route was found, create a context first, and add route variables to it
+	// Route was found, create a context first, and add headers and route variables to it
 
 	resourceHandlerContext := ResourceHandlerContext{}
 	resourceHandlerContext.RouteVariables = routeVariables
+	resourceHandlerContext.Header = request.Header
 
 	// No endpoint registered on that node
 	if node.GetEndpoint() == nil {
