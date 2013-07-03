@@ -50,6 +50,7 @@ type ResourceHandlerContext struct {
 	ContentTypeOut  *string
 	Body            *bytes.Buffer
 	Header          http.Header
+	RequestId       *string
 }
 
 type ResourceHandlerResult struct {

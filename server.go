@@ -168,12 +168,16 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	// Route was found, create a context first, and add headers and route variables to it
+	// Route was found, create a context first
+	// Add headers, route variables, and requestId if any to it
 
 	resourceHandlerContext := ResourceHandlerContext{}
 	resourceHandlerContext.RouteVariables = routeVariables
 	resourceHandlerContext.Header = request.Header
-
+	if s.debugEnableLogRequestIdentifier {
+		resourceHandlerContext.RequestId = &requestId
+	}
+	
 	// No endpoint registered on that node
 	if node.GetEndpoint() == nil {
 		message := fmt.Sprintf("[%s] No endpoint found for this route %s", requestId, urlPath)
