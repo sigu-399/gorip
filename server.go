@@ -50,12 +50,14 @@ type Server struct {
 	debugEnableLogRequestDump       bool
 	debugEnableLogRequestIdentifier bool
 	debugEnableLogRequestDuration   bool
+
+	internalResourceResultRenderer InternalResourceResultRenderer
 }
 
 func NewServer(pattern string, address string) *Server {
 
 	log.Printf("=== Create RIP Server\n")
-	return &Server{pattern: pattern, address: address, router: newRouter()}
+	return &Server{pattern: pattern, address: address, router: newRouter(), internalResourceResultRenderer: &DefaultInternalResourceResultRenderer{}}
 
 }
 
@@ -177,7 +179,7 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	if s.debugEnableLogRequestIdentifier {
 		resourceHandlerContext.RequestId = &requestId
 	}
-	
+
 	// No endpoint registered on that node
 	if node.GetEndpoint() == nil {
 		message := fmt.Sprintf("[%s] No endpoint found for this route %s", requestId, urlPath)
@@ -325,7 +327,31 @@ func (s *Server) NewRouteVariableType(kind string, rvtype RouteVariableType) err
 	return s.router.NewRouteVariableType(kind, rvtype)
 }
 
+func (s *Server) SetInternalResourceResultRenderer(r InternalResourceResultRenderer) {
+	s.internalResourceResultRenderer = r
+}
+
 func (s *Server) renderResourceResult(writer http.ResponseWriter, result *ResourceHandlerResult, contentType string, requestId string) {
+
+	if s.internalResourceResultRenderer == nil {
+		panic("Internal resource result renderer is invalid")
+	}
+
+	s.internalResourceResultRenderer.Render(writer, result, contentType, requestId)
+
+	jsonResult, _ := json.Marshal(result)
+	log.Printf("[%s] Response result : %s", requestId, jsonResult)
+
+}
+
+type InternalResourceResultRenderer interface {
+	Render(writer http.ResponseWriter, result *ResourceHandlerResult, contentType string, requestId string)
+}
+
+type DefaultInternalResourceResultRenderer struct {
+}
+
+func (r *DefaultInternalResourceResultRenderer) Render(writer http.ResponseWriter, result *ResourceHandlerResult, contentType string, requestId string) {
 
 	bodyOutLen := 0
 	if result.Body != nil {
@@ -346,8 +372,4 @@ func (s *Server) renderResourceResult(writer http.ResponseWriter, result *Resour
 			log.Printf("[%s] Error while writing the body %s", requestId, err.Error())
 		}
 	}
-
-	jsonResult, _ := json.Marshal(result)
-	log.Printf("[%s] Response result : %s", requestId, jsonResult)
-
 }
