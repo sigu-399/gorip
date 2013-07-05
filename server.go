@@ -225,7 +225,7 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	matchingResource, contentTypeIn, contentTypeOut := endp.FindMatchingResource(method, &contentTypeParser, &acceptParser)
 
 	if matchingResource == nil {
-		message := fmt.Sprintf("[%s] No available resource for this Content-Type", requestId)
+		message := fmt.Sprintf("[%s] No available resource matching the given Method, Content-Type and Accept", requestId)
 		log.Printf(message)
 		s.renderResourceResult(writer, &ResourceHandlerResult{HttpStatus: http.StatusBadRequest, Body: bytes.NewBufferString(message)}, `text/plain`, requestId)
 		return
