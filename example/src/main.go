@@ -70,7 +70,7 @@ func onError(err error) {
 
 func main() {
 
-	// Setup a server listenning to everything on port 8080
+	// Setup a server listening to everything on port 8080
 	myServer := gorip.NewServer("/", ":8080")
 
 	// Registers our route variable

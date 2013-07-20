@@ -91,7 +91,7 @@ func (s *Server) DebugEnableLogRequestDuration(b bool) {
 
 func (s *Server) ListenAndServe() error {
 
-	Flog(FLOG_TYPE_ACTION, fmt.Sprintf("goRip is Ready, listenning on %s\n", TermColorEscape(s.address, TERM_COLOR_BLUE)))
+	Flog(FLOG_TYPE_ACTION, fmt.Sprintf("goRip is Ready, listening to %s\n", TermColorEscape(s.address, TERM_COLOR_BLUE)))
 
 	http.Handle(s.pattern, s)
 	return http.ListenAndServe(s.address, nil)
