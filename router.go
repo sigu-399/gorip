@@ -28,7 +28,6 @@ package gorip
 import (
 	"errors"
 	"fmt"
-	"log"
 	"regexp"
 	"strings"
 )
@@ -120,7 +119,7 @@ func (r *router) NewEndpoint(endp *endpoint) error {
 // Adds a route variable validator to the router
 func (r *router) NewRouteVariableType(kind string, rvType RouteVariableType) error {
 
-	log.Printf("New route variable type with kind '%s'\n", kind)
+	Flog(FLOG_TYPE_INFO, fmt.Sprintf("New route variable type with kind '%s'\n", kind))
 
 	if r.GetRouteVariableTypeByKind(kind) != nil {
 		return errors.New(fmt.Sprintf(`Route variable variable type with kind '%s' already exists`, kind))
@@ -190,7 +189,7 @@ func (r *router) printRouterTreeRecursive(node routerNode, text string, level in
 		indent += ` `
 	}
 
-	log.Printf("%s/%s\n", indent, text)
+	fmt.Printf("%s/%s\n", indent, text)
 
 	children := node.GetChildren()
 
@@ -277,7 +276,7 @@ func (rni *routerNodeImplementation) GetChildByPart(part string, invariableMode 
 				validator := child.GetRouter().GetRouteVariableTypeByKind(variable.kind)
 				if validator.Matches(part) {
 					if nodeFound != nil {
-						log.Printf("Warning : Multiple routings for a given route")
+						Flog(FLOG_TYPE_WARNING, fmt.Sprintf("Multiple routings for a given route"))
 					}
 					nodeFound = child
 				}
@@ -289,7 +288,7 @@ func (rni *routerNodeImplementation) GetChildByPart(part string, invariableMode 
 	// Check invariable ones
 	if _, ok := rni.children[part]; ok {
 		if nodeFound != nil {
-			log.Printf("Warning : Multiple routings for a given route")
+			Flog(FLOG_TYPE_WARNING, fmt.Sprintf("Multiple routings for a given route"))
 		}
 		return rni.children[part]
 	}
@@ -356,12 +355,16 @@ func init() {
 
 	regexpRouteVariable, err = regexp.Compile(const_regexp_route_variable_pattern)
 	if err != nil {
-		panic("Could not compile regexpRouteVariable")
+		panicMsg := "Could not compile regexpRouteVariable"
+		Flog(FLOG_TYPE_ERROR, panicMsg)
+		panic(panicMsg)
 	}
 
 	regexpRouteVariableParts, err = regexp.Compile(const_regexp_route_variable_parts_pattern)
 	if err != nil {
-		panic("Could not compile regexpRouteVariableParts")
+		panicMsg := "Could not compile regexpRouteVariableParts"
+		Flog(FLOG_TYPE_ERROR, panicMsg)
+		panic(panicMsg)
 	}
 
 }
