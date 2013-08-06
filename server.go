@@ -27,11 +27,10 @@ package gorip
 
 import (
 	"bytes"
-	"crypto/sha1"
-	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/sigu-399/goxibeta"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -310,9 +309,8 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 }
 
 func (s *Server) generateRequestId(t time.Time) string {
-	hasher := sha1.New()
-	hasher.Write([]byte(t.String()))
-	return base64.URLEncoding.EncodeToString(hasher.Sum(nil))
+	xbCodec := goxibeta.NewXiBetaCodec()
+	return xbCodec.Encode(rand.Int63()) + xbCodec.Encode(t.UnixNano())
 }
 
 func (s *Server) dumpRequest(request *http.Request, requestId string) {
