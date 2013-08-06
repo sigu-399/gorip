@@ -32,6 +32,7 @@ import (
 	"fmt"
 	"github.com/sigu-399/goxibeta"
 	"io/ioutil"
+	"math/rand"
 	"net/http"
 	"strconv"
 	"time"
