@@ -199,14 +199,14 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 
 	acceptParser, err := newAcceptHeaderParser(request.Header.Get(`Accept`))
 	if err != nil {
-		message := fmt.Sprintf("Invalid Accept header : %s", requestId, err.Error())
+		message := fmt.Sprintf("Invalid Accept header : %s", err.Error())
 		Flog(FLOG_TYPE_ERROR, fmt.Sprintf("%s Invalid Accept header : %s", requestId, err.Error()))
 		s.renderResourceResult(writer, &ResourceHandlerResult{HttpStatus: http.StatusBadRequest, Body: bytes.NewBufferString(message)}, `text/plain`, requestId)
 		return
 	}
 
 	if !acceptParser.HasAcceptElement() {
-		message := fmt.Sprintf("No valid Accept header was given", requestId)
+		message := fmt.Sprintf("No valid Accept header was given")
 		Flog(FLOG_TYPE_ERROR, fmt.Sprintf("%s No valid Accept header was given", requestId))
 		s.renderResourceResult(writer, &ResourceHandlerResult{HttpStatus: http.StatusBadRequest, Body: bytes.NewBufferString(message)}, `text/plain`, requestId)
 		return
